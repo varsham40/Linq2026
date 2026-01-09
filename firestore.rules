@@ -1,0 +1,66 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isPlatformAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'platform_admin';
+    }
+
+    function isCollegeAdmin(collegeId) {
+       return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.homeCollegeId == collegeId &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'college_admin';
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId; // Users can edit their own profile
+    }
+
+    // Colleges Collection
+    match /colleges/{collegeId} {
+      allow read: if true;
+      allow write: if isPlatformAdmin(); // Only platform super-admins can create colleges
+
+      // Clubs Subcollection
+      match /clubs/{clubId} {
+        allow read: if true;
+        allow write: if isCollegeAdmin(collegeId);
+
+        // Events Subcollection
+        match /events/{eventId} {
+          allow read: if true;
+          // Only Club Admins listed in the parent club can write events
+          allow write: if isAuthenticated() && 
+            request.auth.uid in get(/databases/$(database)/documents/colleges/$(collegeId)/clubs/$(clubId)).data.adminIds;
+
+          // Registrations Subcollection
+          match /registrations/{regId} {
+            // Users can read their own registration
+            allow read: if isAuthenticated() && (
+              resource.data.userId == request.auth.uid || 
+              // Or if they are a club admin
+              request.auth.uid in get(/databases/$(database)/documents/colleges/$(collegeId)/clubs/$(clubId)).data.adminIds
+            );
+            
+            // Users can create a registration for themselves
+            allow create: if isAuthenticated() && 
+              request.resource.data.userId == request.auth.uid;
+              
+            // Only admins can update (e.g., mark attendance)
+            allow update: if isAuthenticated() && 
+               request.auth.uid in get(/databases/$(database)/documents/colleges/$(collegeId)/clubs/$(clubId)).data.adminIds;
+          }
+        }
+      }
+    }
+  }
+}
