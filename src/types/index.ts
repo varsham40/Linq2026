@@ -87,6 +87,7 @@ export interface Registration {
     checkInTime?: number;
     customData?: Record<string, any>; // Responses to registrationFields
     registeredAt: number;
+    attended?: boolean;
 }
 
 export interface Feedback {
