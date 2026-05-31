@@ -10,10 +10,11 @@ import {
     signOut as firebaseSignOut
 } from 'firebase/auth';
 import { auth } from './firebase';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface AuthContextType {
     user: User | null;
+    profile: UserProfile | null;
     loading: boolean;
     signInWithGoogle: () => Promise<User | null>;
     logout: () => Promise<void>;
@@ -23,6 +24,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({
     user: null,
+    profile: null,
     loading: true,
     signInWithGoogle: async () => null,
     logout: async () => { },
@@ -36,8 +38,10 @@ import { UserProfile } from '@/types';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -47,24 +51,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const userRef = doc(db, 'users', user.uid);
                 try {
                     const userSnap = await getDoc(userRef);
-                    if (!userSnap.exists()) {
-                        // Determine if we are already on the onboarding page to avoid loop
-                        if (window.location.pathname !== '/onboarding') {
-                            router.push('/onboarding');
-                        }
+
+                    if (userSnap.exists()) {
+                        setProfile(userSnap.data() as UserProfile);
                     } else {
-                        // Profile exists
+                        setProfile(null);
+                    }
+
+                    // If user profile doesn't exist or onboarding not completed
+                    if (!userSnap.exists() || !userSnap.data()?.onboardingCompleted) {
+                        const currentPath = pathname || window.location.pathname;
+
+                        // Avoid redirect loop if already on onboarding or signup
+                        if (currentPath !== '/onboarding' && currentPath !== '/signup') {
+                            router.replace('/onboarding');
+                        }
                     }
                 } catch (err) {
                     console.error("Error checking user profile:", err);
                 }
+            } else {
+                setProfile(null);
             }
             setUser(user);
             setLoading(false);
         });
 
         return () => unsubscribe();
-    }, [router]);
+    }, [router, pathname]);
 
     const signUpWithEmail = async (email: string, pass: string) => {
         try {
@@ -102,6 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const logout = async () => {
         try {
             await firebaseSignOut(auth);
+            setProfile(null);
             router.push('/');
         } catch (error) {
             console.error("Error signing out", error);
@@ -109,7 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, signInWithGoogle, logout, signUpWithEmail, signInWithEmail }}>
+        <AuthContext.Provider value={{ user, profile, loading, signInWithGoogle, logout, signUpWithEmail, signInWithEmail }}>
             {!loading && children}
         </AuthContext.Provider>
     );

@@ -22,6 +22,9 @@ export const metadata: Metadata = {
 };
 
 import { AuthProvider } from '@/lib/auth-context';
+import { ThemeProvider } from '@/lib/theme-context';
+import AICopilot from '@/components/AICopilot';
+import PostAnnouncementFAB from '@/components/PostAnnouncementFAB';
 
 export default function RootLayout({
   children,
@@ -29,13 +32,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
-      <body style={{ fontFamily: 'var(--font-inter)' }}>
-        <AuthProvider>
-          <main className="min-h-screen flex flex-col">
-            {children}
-          </main>
-        </AuthProvider>
+    <html lang="en" className={`${inter.variable} ${outfit.variable}`} suppressHydrationWarning>
+      <body style={{ fontFamily: 'var(--font-inter)', transition: 'background-color 0.3s ease, color 0.3s ease' }}>
+        <ThemeProvider>
+          <AuthProvider>
+            <AICopilot />
+            <PostAnnouncementFAB />
+            <main className="min-h-screen flex flex-col">
+              {children}
+            </main>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

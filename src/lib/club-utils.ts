@@ -1,4 +1,5 @@
-import { collection, query, where, getDocs, addDoc, doc, setDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, doc, setDoc, updateDoc, writeBatch, getDoc } from 'firebase/firestore';
+import { Event } from '@/types';
 import { db } from './firebase';
 import { Club } from '@/types';
 
@@ -88,8 +89,75 @@ export async function createClub(clubData: Omit<Club, 'id' | 'createdAt'>, admin
 
     const docRef = await addDoc(collection(db, 'clubs'), {
         ...clubData,
+        adminEmail: adminEmail || null,
         adminIds: [...new Set(adminIds)], // dedupe
         createdAt: Date.now()
     });
     return docRef.id;
 }
+
+export const endEvent = async (eventId: string) => {
+    const eventRef = doc(db, 'events', eventId);
+    await updateDoc(eventRef, { status: 'ENDED' });
+};
+
+export const generateCertificates = async (event: Event) => {
+    // 1. Get all registrations that attended
+    const regRef = collection(db, `events/${event.id}/registrations`);
+    const q = query(regRef, where('attended', '==', true));
+    const snap = await getDocs(q);
+
+    if (snap.empty) return 0;
+
+    // Fetch Club & College Details
+    let clubName = 'Unknown Club';
+    let collegeName = 'Unknown College';
+    let collegeId = event.collegeId;
+
+    if (event.clubId) {
+        const clubSnap = await getDoc(doc(db, 'clubs', event.clubId));
+        if (clubSnap.exists()) {
+            const clubData = clubSnap.data() as Club;
+            clubName = clubData.name;
+            collegeId = clubData.collegeId;
+        }
+    }
+
+    // Try to resolve college name
+    if (collegeId) {
+        const colSnap = await getDoc(doc(db, 'colleges', collegeId));
+        if (colSnap.exists()) {
+            collegeName = colSnap.data().name;
+        } else {
+            // Fallback: Use ID as name if not found, but humanize Global_College
+            collegeName = collegeId === 'Global_College' ? 'CMRIT' : collegeId;
+        }
+    }
+
+    const batch = writeBatch(db);
+    let count = 0;
+
+    snap.docs.forEach(d => {
+        const reg = d.data();
+        // Deterministic ID for idempotency: eventId
+        const specificCertRef = doc(db, 'users', reg.userId, 'certificates', event.id);
+
+        batch.set(specificCertRef, {
+            eventId: event.id,
+            eventName: event.title,
+            eventDate: event.startTime,
+            collegeName: collegeName,
+            clubName: clubName,
+            clubId: event.clubId,
+            collegeId: collegeId,
+            studentName: reg.userName,
+            studentEmail: reg.userEmail,
+            issuedAt: Date.now(),
+            certificateId: specificCertRef.id
+        });
+        count++;
+    });
+
+    await batch.commit();
+    return count;
+};

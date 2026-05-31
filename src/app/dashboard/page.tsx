@@ -34,6 +34,8 @@ export default function DashboardPage() {
                         router.push('/dashboard/college-admin');
                     } else if (role === 'club_admin') {
                         router.push('/dashboard/club-admin');
+                    } else if (role === 'club_member') {
+                        router.push('/dashboard/club-member');
                     } else {
                         router.push('/dashboard/student');
                     }

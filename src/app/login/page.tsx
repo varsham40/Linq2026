@@ -24,7 +24,7 @@ export default function LoginPage() {
 
         try {
             await signInWithEmail(email, password);
-            router.push('/');
+            router.push('/dashboard');
         } catch (err: any) {
             console.error(err);
             setError("Invalid email or password.");
@@ -36,7 +36,7 @@ export default function LoginPage() {
     const handleGoogleLogin = async () => {
         try {
             await signInWithGoogle();
-            router.push('/');
+            router.push('/dashboard');
         } catch (err) {
             console.error(err);
         }

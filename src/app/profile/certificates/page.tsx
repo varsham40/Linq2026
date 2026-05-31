@@ -2,9 +2,9 @@
 import { useAuth } from '@/lib/auth-context';
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Certificate } from '@/types';
+import { Certificate, Club, Event } from '@/types';
 import jsPDF from 'jspdf';
 
 export default function MyCertificates() {
@@ -23,68 +23,145 @@ export default function MyCertificates() {
         fetchCerts();
     }, [user]);
 
-    const downloadPDF = (cert: Certificate) => {
-        const doc = new jsPDF({
+    const downloadPDF = async (cert: Certificate) => {
+        // 1. Fetch fresh data (Retroactive Fix)
+        let clubName = cert.clubName || "Club Name";
+        let collegeName = cert.collegeName || "College Name";
+
+        try {
+            // Fetch Event to get Club ID
+            const eventRef = doc(db, 'events', cert.eventId);
+            const eventSnap = await getDoc(eventRef);
+
+            if (eventSnap.exists()) {
+                const eventData = eventSnap.data() as Event;
+
+                if (eventData.clubId) {
+                    const clubSnap = await getDoc(doc(db, 'clubs', eventData.clubId));
+                    if (clubSnap.exists()) {
+                        const clubData = clubSnap.data() as Club;
+                        clubName = clubData.name;
+                        // Determine college name 
+                        // For MVP, we might need to fetch college or just use club's collegeId if it's a string name (unlikely)
+                        // logic: if collegeId is an ID, fetch it.
+                        if (clubData.collegeId) {
+                            // Attempt fetch
+                            const colSnap = await getDoc(doc(db, 'colleges', clubData.collegeId));
+                            if (colSnap.exists()) {
+                                collegeName = colSnap.data().name;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Error fetching fresh cert details:", err);
+            // Fallback to existing cert data
+        }
+
+        const pdf = new jsPDF({
             orientation: 'landscape',
             unit: 'px',
-            format: [800, 600]
+            format: [842, 595] // A4 Landscape roughly
         });
 
-        // Background
-        doc.setFillColor(255, 255, 255);
-        doc.rect(0, 0, 800, 600, 'F');
+        const width = pdf.internal.pageSize.getWidth();
+        const height = pdf.internal.pageSize.getHeight();
 
-        // Border
-        doc.setLineWidth(10);
-        doc.setDrawColor(59, 130, 246); // Blue border
-        doc.rect(20, 20, 760, 560);
+        // --- Background & Border ---
+        pdf.setFillColor(255, 255, 255);
+        pdf.rect(0, 0, width, height, 'F');
+
+        // Professional Border
+        pdf.setDrawColor(20, 20, 20);
+        pdf.setLineWidth(2);
+        pdf.rect(20, 20, width - 40, height - 40);
+
+        pdf.setDrawColor(218, 165, 32); // Gold
+        pdf.setLineWidth(5);
+        pdf.rect(25, 25, width - 50, height - 50);
+
+        // --- Content ---
 
         // Header
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(40);
-        doc.setTextColor(59, 130, 246);
-        doc.text("CERTIFICATE OF PARTICIPATION", 400, 100, { align: 'center' });
+        pdf.setFont("times", "bold");
+        pdf.setFontSize(48);
+        pdf.setTextColor(30, 30, 30);
+        pdf.text("CERTIFICATE", width / 2, 100, { align: 'center' });
 
-        // Body
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(20);
-        doc.setTextColor(50, 50, 50);
-        doc.text("This is to certify that", 400, 180, { align: 'center' });
+        pdf.setFontSize(18);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(100, 100, 100);
+        pdf.text("OF ACHIEVEMENT", width / 2, 130, { align: 'center', charSpace: 3 });
 
-        // Name
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(36);
-        doc.setTextColor(0, 0, 0);
-        doc.text(cert.studentName, 400, 240, { align: 'center' });
+        // Body Text
+        pdf.setFontSize(14);
+        pdf.setTextColor(60, 60, 60);
+        pdf.text("This is to certify that", width / 2, 180, { align: 'center' });
 
-        // Event Text
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(20);
-        doc.setTextColor(50, 50, 50);
-        doc.text("has successfully attended the event", 400, 300, { align: 'center' });
+        // Student Name
+        pdf.setFont("times", "bolditalic");
+        pdf.setFontSize(42);
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(cert.studentName, width / 2, 230, { align: 'center' });
+
+        pdf.setDrawColor(200, 200, 200);
+        pdf.setLineWidth(1);
+        pdf.line(width / 2 - 150, 240, width / 2 + 150, 240);
+
+        // Participation Text
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(14);
+        pdf.setTextColor(60, 60, 60);
+        pdf.text("has successfully participated in the event", width / 2, 270, { align: 'center' });
 
         // Event Name
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(28);
-        doc.text(cert.eventName, 400, 350, { align: 'center' });
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(28);
+        pdf.setTextColor(33, 150, 243); // Blue Theme
+        pdf.text(cert.eventName, width / 2, 310, { align: 'center' });
 
-        // Date & Org
-        doc.setFontSize(16);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Organized by ${cert.collegeName}`, 400, 400, { align: 'center' });
-        doc.text(`Date: ${new Date(cert.eventDate).toLocaleDateString()}`, 400, 430, { align: 'center' });
+        // Organized By
+        const displayCollegeName = collegeName === 'Global_College' ? 'CMR Inst. of Technology' :
+            (collegeName === 'MLRIT' ? 'MLR Inst. of Technology' : collegeName);
 
-        // Footer / Signature Mock
-        doc.setLineWidth(1);
-        doc.setDrawColor(0, 0, 0);
-        doc.line(200, 500, 350, 500);
-        doc.line(450, 500, 600, 500);
+        pdf.setFont("times", "italic");
+        pdf.setFontSize(16);
+        pdf.setTextColor(40, 40, 40);
+        pdf.text(`Organized by ${clubName}`, width / 2, 350, { align: 'center' });
 
-        doc.setFontSize(12);
-        doc.text("College Admin", 275, 520, { align: 'center' });
-        doc.text("Club President", 525, 520, { align: 'center' });
+        pdf.setFont("times", "bold");
+        pdf.text(`at ${displayCollegeName}`, width / 2, 370, { align: 'center' });
 
-        doc.save(`${cert.eventName}_Certificate.pdf`);
+        // Date
+        const dateStr = new Date(cert.eventDate).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(12);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(`Date: ${dateStr}`, width / 2, 400, { align: 'center' });
+
+        // --- Signatures ---
+        const sigY = 470;
+
+        // Signature Lines
+        pdf.setDrawColor(50, 50, 50);
+        pdf.setLineWidth(1);
+        pdf.line(150, sigY, 300, sigY);
+        pdf.line(width - 300, sigY, width - 150, sigY);
+
+        // Titles
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(12);
+        pdf.setTextColor(0, 0, 0);
+        pdf.text("Faculty Coordinator", 225, sigY + 20, { align: 'center' });
+        pdf.text("Club President", width - 225, sigY + 20, { align: 'center' });
+
+        // Footer ID (Verification)
+        pdf.setFontSize(9);
+        pdf.setTextColor(150, 150, 150);
+        pdf.text(`Certificate ID: ${cert.id.substring(0, 8).toUpperCase()}  •  Verified by Linq`, width / 2, height - 30, { align: 'center' });
+
+        pdf.save(`${cert.eventName}_Certificate.pdf`);
     };
 
     return (

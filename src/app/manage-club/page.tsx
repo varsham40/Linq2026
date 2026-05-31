@@ -68,7 +68,7 @@ export default function ManageClubPage() {
                     logoURL: formData.logoURL
                 });
             }
-            router.push('/dashboard/club-admin');
+            router.push('/dashboard');
         } catch (e) {
             console.error(e);
         } finally {

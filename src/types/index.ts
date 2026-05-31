@@ -1,4 +1,4 @@
-export type Role = 'platform_admin' | 'college_admin' | 'club_admin' | 'student';
+export type Role = 'platform_admin' | 'college_admin' | 'club_admin' | 'club_member' | 'student';
 
 export interface UserProfile {
     uid: string;
@@ -12,6 +12,14 @@ export interface UserProfile {
     branch?: string; // e.g., "CSE", "ECE"
     interests?: string[];
     createdAt: number;
+}
+
+export interface EventAnnouncement {
+    id: string;
+    message: string;
+    postedAt: number;
+    authorName: string;
+    authorId?: string;
 }
 
 export interface College {
@@ -29,11 +37,35 @@ export interface Club {
     name: string;
     description: string;
     logoURL?: string;
+    socialMedia?: {
+        instagram?: string;
+        linkedin?: string;
+        twitter?: string;
+        website?: string;
+    };
     adminIds: string[]; // UIDs of students who manage this club
+    adminEmail?: string; // Email of the primary admin for whitelisting
     createdAt: number;
 }
 
-export type EventScope = 'COLLEGE_ONLY' | 'GLOBAL';
+export interface ClubMember {
+    uid: string;
+    email: string;
+    displayName: string;
+    role: 'member' | 'lead';
+    joinedAt: number;
+}
+
+export interface WhitelistedMember {
+    id: string; // email
+    email: string;
+    role: string; // "Event Lead", "Member", etc.
+    clubId: string;
+    addedAt: number;
+    addedBy: string; // admin uid
+}
+
+export type EventScope = 'COLLEGE' | 'GLOBAL';
 
 export interface Event {
     id: string;
@@ -49,9 +81,11 @@ export interface Event {
     registrationFields: RegistrationField[]; // Custom fields
     createdAt: number;
     attendeeCount?: number;
+    registrationCount?: number;
     createdBy?: string;
     status?: 'UPCOMING' | 'LIVE' | 'ENDED';
     certificatesIssued?: boolean;
+    registrationDeadline?: number;
 }
 
 export interface Certificate {
@@ -63,6 +97,10 @@ export interface Certificate {
     studentName: string;
     studentEmail: string;
     collegeName: string;
+    clubName?: string;
+    clubId?: string;
+    collegeId?: string;
+    downloadURL: string;
 }
 
 export interface RegistrationField {
@@ -98,4 +136,18 @@ export interface Feedback {
     rating: number; // 1-5
     comment: string;
     createdAt: number;
+}
+
+export type NotificationType = 'GENERAL' | 'URGENT' | 'EVENT';
+
+export interface Notification {
+    id: string;
+    title: string;
+    message: string;
+    clubId: string;
+    clubName: string;
+    type: NotificationType;
+    createdAt: number;
+    authorId?: string;
+    authorName?: string;
 }

@@ -7,6 +7,19 @@ import { db } from '@/lib/firebase';
 import { UserProfile, Certificate } from '@/types';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import Navbar from '@/components/Navbar';
+import { User as UserIcon, Heart, Phone, Building2, Calendar, Award, ExternalLink, GraduationCap, Edit2 } from 'lucide-react';
+
+const PLACEHOLDER_IMAGES = [
+    "https://images.unsplash.com/photo-1504384308090-c54be630cd9f?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1544531586-fde5298cdd40?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80"
+];
+
+const getEventImage = (id: string) => {
+    const index = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % PLACEHOLDER_IMAGES.length;
+    return PLACEHOLDER_IMAGES[index];
+};
 
 export default function ProfilePage() {
     const { user } = useAuth();
@@ -86,159 +99,207 @@ export default function ProfilePage() {
     if (!user || !profile) return <div className="min-h-screen flex items-center justify-center">Profile not found.</div>;
 
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+        <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--fg)', fontFamily: 'var(--font-inter)', transition: 'background-color 0.3s ease, color 0.3s ease' }}>
             <Navbar />
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                @media (max-width: 900px) {
+                    .profile-grid { grid-template-columns: 1fr !important; }
+                    .banner-content { flex-direction: column !important; align-items: center !important; text-align: center !important; }
+                    .banner-actions { padding-top: 24px !important; }
+                }
+            `}} />
 
-            <div className="container padding-y">
-                <div className="glass-panel" style={{ maxWidth: '800px', margin: '0 auto', overflow: 'hidden' }}>
+            <main style={{ maxWidth: '1600px', margin: '0 auto', padding: '100px 24px 80px' }}>
 
-                    {/* Header / Banner */}
-                    <div style={{ height: '150px', background: 'linear-gradient(to right, var(--primary), var(--accent))', position: 'relative' }}>
-                        <div style={{
-                            position: 'absolute', bottom: '-40px', left: '40px',
-                            width: '100px', height: '100px', borderRadius: '50%',
-                            background: '#18181b', border: '4px solid #18181b',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            overflow: 'hidden'
-                        }}>
-                            {user.photoURL ? (
-                                <img src={user.photoURL} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                                <span style={{ fontSize: '2.5rem' }}>👤</span>
-                            )}
-                        </div>
-                    </div>
+                {/* Top Banner Card */}
+                <div style={{ background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--card-border)', overflow: 'hidden', marginBottom: '24px' }}>
+                    <div style={{ height: '160px', background: 'linear-gradient(to right, #1e1b4b, #312e81, #4c1d95)' }}></div>
+                    <div className="banner-content" style={{ padding: '0 32px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative' }}>
 
-                    <div style={{ marginTop: '50px', padding: '0 40px 40px 40px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '2rem' }}>
-                            <div>
-                                <h1 style={{ fontSize: '2rem' }}>{profile.displayName}</h1>
-                                <div style={{ opacity: 0.7, marginBottom: '0.5rem' }}>{profile.email}</div>
-                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                    <span style={{ padding: '0.2rem 0.8rem', borderRadius: '20px', background: 'rgba(255,255,255,0.1)', fontSize: '0.8rem', textTransform: 'capitalize' }}>
-                                        {profile.role?.replace('_', ' ')}
-                                    </span>
-                                    <span style={{ fontSize: '0.9rem', opacity: 0.8 }}>at <strong>{profile.homeCollegeId}</strong></span>
+                        <div className="banner-content" style={{ display: 'flex', gap: '24px' }}>
+                            <div style={{
+                                width: '140px', height: '140px', borderRadius: '50%', background: 'var(--card-bg)',
+                                border: '6px solid var(--card-bg)', marginTop: '-70px', overflow: 'hidden', flexShrink: 0
+                            }}>
+                                {user.photoURL ? (
+                                    <img src={user.photoURL} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                    <div style={{ width: '100%', height: '100%', background: 'var(--primary)', color: '#fff', display: 'grid', placeItems: 'center', fontSize: '3rem', fontWeight: 'bold' }}>
+                                        {profile.displayName.charAt(0).toUpperCase()}
+                                    </div>
+                                )}
+                            </div>
+                            <div style={{ paddingTop: '16px' }}>
+                                <h1 style={{ fontSize: '1.8rem', fontWeight: 'bold', marginBottom: '4px', color: 'var(--fg)', fontFamily: 'var(--font-outfit)' }}>{profile.displayName}</h1>
+                                <div style={{ color: 'var(--text-muted)', fontSize: '1rem', marginBottom: '16px' }}>{profile.email}</div>
+                                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'var(--hover-bg)', border: '1px solid var(--glass-border)', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-muted)' }}>
+                                    <GraduationCap size={18} />
+                                    <span style={{ textTransform: 'capitalize' }}>{profile.role?.replace('_', ' ')}</span> at {profile.homeCollegeId}
                                 </div>
                             </div>
+                        </div>
 
-                            {!isEditing && (
-                                <button onClick={() => setIsEditing(true)} className="btn" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                                    Edit Profile
+                        <div className="banner-actions" style={{ paddingTop: '16px' }}>
+                            {isEditing ? (
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button onClick={handleSave} style={{ padding: '10px 20px', background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Save</button>
+                                    <button onClick={() => setIsEditing(false)} style={{ padding: '10px 20px', background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--card-border)', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Cancel</button>
+                                </div>
+                            ) : (
+                                <button onClick={() => setIsEditing(true)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: '#c4b5fd', color: '#1e1b4b', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: 'opacity 0.2s' }}>
+                                    <Edit2 size={16} /> Edit Profile
                                 </button>
                             )}
                         </div>
-
-                        <hr style={{ borderColor: 'var(--glass-border)', marginBottom: '2rem' }} />
-
-                        {isEditing ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                                <div>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Bio</label>
-                                    <textarea
-                                        className="input-fld"
-                                        value={editBio}
-                                        onChange={(e) => setEditBio(e.target.value)}
-                                        style={{ minHeight: '100px' }}
-                                    />
-                                </div>
-                                <div>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Phone</label>
-                                    <input
-                                        className="input-fld"
-                                        value={editPhone}
-                                        onChange={(e) => setEditPhone(e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Branch / Department</label>
-                                    <input
-                                        className="input-fld"
-                                        value={editBranch}
-                                        onChange={(e) => setEditBranch(e.target.value)}
-                                        placeholder="e.g. CSE, ISE, ECE"
-                                    />
-                                </div>
-                                <div>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Interests</label>
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                        {editInterests.map(i => (
-                                            <span key={i} style={{ padding: '0.3rem 0.8rem', background: 'var(--primary)', borderRadius: '20px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                {i} <button onClick={() => removeInterest(i)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>×</button>
-                                            </span>
-                                        ))}
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <input
-                                            className="input-fld"
-                                            style={{ margin: 0 }}
-                                            value={newInterest}
-                                            onChange={(e) => setNewInterest(e.target.value)}
-                                            placeholder="Add interest..."
-                                        />
-                                        <button onClick={addInterest} className="btn" style={{ background: 'rgba(255,255,255,0.1)' }}>Add</button>
-                                    </div>
-                                </div>
-
-                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                                    <button onClick={handleSave} className="btn btn-primary">Save Changes</button>
-                                    <button onClick={() => setIsEditing(false)} className="btn" style={{ background: 'transparent' }}>Cancel</button>
-                                </div>
-                            </div>
-                        ) : (
-                            <>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-                                    <div>
-                                        <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>About</h3>
-                                        <p style={{ opacity: 0.8, lineHeight: '1.6' }}>
-                                            {profile.bio || "No bio added yet."}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <h3 style={{ fontSize: '1.2rem', marginBottom: '0.8rem' }}>Interests</h3>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                                            {profile.interests && profile.interests.length > 0 ? profile.interests.map(tag => (
-                                                <span key={tag} style={{ padding: '0.3rem 0.8rem', background: 'rgba(255,255,255,0.05)', borderRadius: '20px', fontSize: '0.85rem', border: '1px solid var(--glass-border)' }}>
-                                                    {tag}
-                                                </span>
-                                            )) : <span style={{ opacity: 0.5 }}>No interests added.</span>}
-                                        </div>
-
-                                        <div style={{ marginTop: '2rem' }}>
-                                            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>Contact</h3>
-                                            <div style={{ opacity: 0.8 }}>
-                                                {profile.phone ? `📞 ${profile.phone}` : "No phone number linked."}
-                                            </div>
-                                            <div style={{ opacity: 0.8, marginTop: '8px' }}>
-                                                {profile.branch ? `🎓 ${profile.branch}` : "No branch details."}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                {/* Attended Events Section */}
-                                <div style={{ marginTop: '30px', borderTop: '1px solid var(--glass-border)', paddingTop: '30px' }}>
-                                    <h3 style={{ fontSize: '1.2rem', marginBottom: '16px' }}>Attended Events & Certifications ({certificates.length})</h3>
-                                    {certificates.length > 0 ? (
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
-                                            {certificates.map(cert => (
-                                                <div key={cert.id} style={{ padding: '16px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                                    <div style={{ fontSize: '0.9rem', fontWeight: 'bold', marginBottom: '4px' }}>{cert.eventName}</div>
-                                                    <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>{new Date(cert.eventDate).toLocaleDateString()}</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <p style={{ opacity: 0.5 }}>No events attended yet.</p>
-                                    )}
-                                </div>
-
-                            </>
-                        )}
                     </div>
                 </div>
-            </div>
+
+                {/* 2-Column Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 2fr', gap: '24px', alignItems: 'start' }} className="profile-grid">
+
+                    {/* Left Column */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+                        {/* About Card */}
+                        <div style={{ background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--card-border)', padding: '24px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                                <div style={{ padding: '8px', background: 'var(--hover-bg)', borderRadius: '8px', color: 'var(--text-muted)' }}><UserIcon size={20} /></div>
+                                <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--fg)' }}>About</h3>
+                            </div>
+                            {isEditing ? (
+                                <textarea value={editBio} onChange={(e) => setEditBio(e.target.value)} style={{ width: '100%', minHeight: '100px', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--card-border)', borderRadius: '8px', color: 'var(--fg)', outline: 'none' }} placeholder="Write something about yourself..." />
+                            ) : (
+                                <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '0.95rem' }}>{profile.bio || "I'm a passionate computer science student with a keen interest in software development and emerging technologies. Always eager to learn and collaborate on innovative projects."}</p>
+                            )}
+                        </div>
+
+                        {/* Interests Card */}
+                        <div style={{ background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--card-border)', padding: '24px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                                <div style={{ padding: '8px', background: 'var(--hover-bg)', borderRadius: '8px', color: 'var(--text-muted)' }}><Heart size={20} /></div>
+                                <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--fg)' }}>Interests</h3>
+                            </div>
+
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                {(isEditing ? editInterests : profile.interests)?.map(tag => (
+                                    <span key={tag} style={{ padding: '6px 16px', background: 'var(--hover-bg)', color: 'var(--fg)', borderRadius: '8px', fontSize: '0.9rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        {tag}
+                                        {isEditing && <button onClick={() => removeInterest(tag)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.2rem', lineHeight: 1 }}>×</button>}
+                                    </span>
+                                ))}
+                                {(!profile.interests || profile.interests.length === 0) && !isEditing && <span style={{ color: 'var(--text-muted)' }}>No interests added.</span>}
+                            </div>
+
+                            {isEditing && (
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                                    <input value={newInterest} onChange={(e) => setNewInterest(e.target.value)} style={{ flex: 1, padding: '10px', background: 'var(--input-bg)', border: '1px solid var(--card-border)', borderRadius: '8px', color: 'var(--fg)', outline: 'none' }} placeholder="Add interest..." />
+                                    <button onClick={addInterest} style={{ padding: '0 16px', background: 'var(--hover-bg)', border: '1px solid var(--card-border)', borderRadius: '8px', color: 'var(--fg)', cursor: 'pointer', fontWeight: 'bold' }}>Add</button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Contact Card */}
+                        <div style={{ background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--card-border)', padding: '24px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                                <div style={{ padding: '8px', background: 'var(--hover-bg)', borderRadius: '8px', color: 'var(--text-muted)' }}><Building2 size={20} /></div>
+                                <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--fg)' }}>Contact</h3>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                    <div style={{ padding: '10px', background: 'var(--hover-bg)', borderRadius: '50%', color: 'var(--text-muted)' }}><Phone size={18} /></div>
+                                    {isEditing ? (
+                                        <input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} style={{ flex: 1, padding: '8px', background: 'var(--input-bg)', border: '1px solid var(--card-border)', borderRadius: '8px', color: 'var(--fg)', outline: 'none' }} placeholder="+91 98765 43210" />
+                                    ) : (
+                                        <span style={{ color: 'var(--fg)', fontWeight: '500', fontSize: '0.95rem' }}>{profile.phone || "+91 98765 43210"}</span>
+                                    )}
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                    <div style={{ padding: '10px', background: 'var(--hover-bg)', borderRadius: '50%', color: 'var(--text-muted)' }}><Building2 size={18} /></div>
+                                    {isEditing ? (
+                                        <input value={editBranch} onChange={(e) => setEditBranch(e.target.value)} style={{ flex: 1, padding: '8px', background: 'var(--input-bg)', border: '1px solid var(--card-border)', borderRadius: '8px', color: 'var(--fg)', outline: 'none' }} placeholder="CMRIT Campus" />
+                                    ) : (
+                                        <span style={{ color: 'var(--fg)', fontWeight: '500', fontSize: '0.95rem' }}>{profile.branch || `${profile.homeCollegeId} Campus`}</span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {/* Right Column */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+                        {/* Attended Events Card */}
+                        <div style={{ background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--card-border)', padding: '32px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <div style={{ padding: '8px', background: 'var(--hover-bg)', borderRadius: '8px', color: 'var(--text-muted)' }}><Calendar size={20} /></div>
+                                    <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--fg)' }}>Attended Events</h3>
+                                </div>
+                                <a href="/dashboard/student" style={{ color: 'var(--text-muted)', fontWeight: 'bold', fontSize: '0.9rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>View All &rarr;</a>
+                            </div>
+
+                            {certificates.length > 0 ? (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+                                    {certificates.slice(0, 2).map(cert => (
+                                        <div key={cert.id} style={{ background: 'var(--hover-bg)', borderRadius: '12px', overflow: 'hidden' }}>
+                                            <div style={{ height: '140px', background: 'var(--glass-border)' }}>
+                                                <img src={getEventImage(cert.eventId || cert.id)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            </div>
+                                            <div style={{ padding: '16px' }}>
+                                                <h4 style={{ color: 'var(--fg)', fontWeight: 'bold', fontSize: '1rem', marginBottom: '8px' }}>{cert.eventName}</h4>
+                                                <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    <Calendar size={14} /> {new Date(cert.eventDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p style={{ color: 'var(--text-muted)' }}>No events attended yet.</p>
+                            )}
+                        </div>
+
+                        {/* Certifications Card */}
+                        <div style={{ background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--card-border)', padding: '32px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <div style={{ padding: '8px', background: 'var(--hover-bg)', borderRadius: '8px', color: 'var(--text-muted)' }}><Award size={20} /></div>
+                                    <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--fg)' }}>Certifications</h3>
+                                </div>
+                                <a href="/dashboard/student" style={{ color: 'var(--text-muted)', fontWeight: 'bold', fontSize: '0.9rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>View All &rarr;</a>
+                            </div>
+
+                            {certificates.length > 0 ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                    {certificates.slice(0, 3).map(cert => (
+                                        <div key={cert.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px', background: 'var(--hover-bg)', borderRadius: '12px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                                                <div style={{ width: '48px', height: '48px', background: 'var(--glass-border)', borderRadius: '12px', display: 'grid', placeItems: 'center', color: '#c084fc' }}>
+                                                    <Award size={24} />
+                                                </div>
+                                                <div>
+                                                    <h4 style={{ color: 'var(--fg)', fontWeight: 'bold', fontSize: '0.95rem', marginBottom: '4px' }}>{cert.eventName} Certificate</h4>
+                                                    <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                                                        linq Platform &bull; Issued {new Date(cert.eventDate).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <a href={cert.downloadURL} target="_blank" style={{ color: 'var(--text-muted)', padding: '8px', background: 'var(--glass-border)', borderRadius: '8px', cursor: 'pointer' }}>
+                                                <ExternalLink size={20} />
+                                            </a>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p style={{ color: 'var(--text-muted)' }}>No certifications earned yet.</p>
+                            )}
+                        </div>
+
+                    </div>
+                </div>
+            </main>
         </div>
 
     );

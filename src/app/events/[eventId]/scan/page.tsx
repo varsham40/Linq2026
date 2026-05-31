@@ -43,6 +43,11 @@ export default function ScanPage() {
                 // Not JSON, use raw
             }
 
+            // Handle Ticket Wrapper
+            if (uid.startsWith('LINQ_TICKET:')) {
+                uid = uid.replace('LINQ_TICKET:', '');
+            }
+
             // Fetch Registration first (Don't mark yet)
             const regRef = doc(db, `events/${eventId}/registrations/${uid}`);
             const snap = await getDoc(regRef);
@@ -106,6 +111,15 @@ export default function ScanPage() {
                 attended: true,
                 attendedAt: Date.now()
             });
+
+            // SYNC to User Profile Registration
+            const userRegRef = doc(db, `users/${uidToMark}/registrations/${eventId}`);
+            try {
+                await updateDoc(userRegRef, { attended: true });
+            } catch (syncErr) {
+                console.warn("Failed to sync attendance to user profile", syncErr);
+                // Non-blocking, but good to know
+            }
 
             // Success Feedback
             // User requested: "give a pop of done"

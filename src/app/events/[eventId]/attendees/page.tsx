@@ -33,14 +33,14 @@ export default function AttendeeListPage({ params }: { params: Promise<{ eventId
         }
 
         // 1. Define Headers
-        const headers = ["Name", "Email", "Registered At", "Status"];
+        const headers = ["Name", "Email", "Registered", "Status"];
 
         // 2. Generate Rows
         const rows = attendees.map(a => {
             // Escape quotes in data to prevent CSV breakage
             const name = (a.userName || "").replace(/"/g, '""');
             const email = (a.userEmail || "").replace(/"/g, '""');
-            const date = new Date(a.registeredAt).toLocaleString().replace(/"/g, '""');
+            const date = new Date(a.registeredAt || 0).toLocaleDateString().replace(/"/g, '""');
             const status = (a.attended ? 'Attended' : 'Registered');
 
             // Wrap each field in quotes
@@ -72,13 +72,13 @@ export default function AttendeeListPage({ params }: { params: Promise<{ eventId
     if (loading) return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>;
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: '#09090b', color: '#fff', fontFamily: 'var(--font-inter)' }}>
+        <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--fg)', fontFamily: 'var(--font-inter)' }}>
             <Navbar />
-            <main style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 24px', paddingTop: '140px', paddingBottom: '80px' }}>
+            <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 40px' }}>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '30px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '20px' }}>
                     <div>
-                        <Link href={`/events/${eventId}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', opacity: 0.6, marginBottom: '16px', fontSize: '0.9rem' }}>
+                        <Link href={`/events/${eventId}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', opacity: 0.6, marginBottom: '16px', fontSize: '0.9rem', color: 'var(--fg)', textDecoration: 'none' }}>
                             ← Back to Event
                         </Link>
                         <h1 style={{ fontSize: '2rem', fontWeight: 'bold' }}>All Attendees</h1>
@@ -86,25 +86,25 @@ export default function AttendeeListPage({ params }: { params: Promise<{ eventId
 
                     <button
                         onClick={handleExport}
-                        style={{ padding: '12px 24px', background: '#22c55e', color: '#000', fontWeight: 'bold', borderRadius: '12px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                        style={{ padding: '12px 24px', background: 'var(--primary)', color: '#fff', fontWeight: 'bold', borderRadius: '12px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
                     >
                         <span>📥</span> Export to CSV
                     </button>
                 </div>
 
-                <div style={{ background: '#121214', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '24px', overflow: 'hidden' }}>
+                <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '24px', overflow: 'hidden' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                         <thead>
-                            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)' }}>
-                                <th style={{ padding: '20px', fontSize: '0.85rem', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>Name</th>
-                                <th style={{ padding: '20px', fontSize: '0.85rem', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>Email</th>
-                                <th style={{ padding: '20px', fontSize: '0.85rem', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>Registered At</th>
-                                <th style={{ padding: '20px', fontSize: '0.85rem', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>Status</th>
+                            <tr style={{ borderBottom: '1px solid var(--card-border)', background: 'var(--hover-bg)' }}>
+                                <th style={{ padding: '20px', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Name</th>
+                                <th style={{ padding: '20px', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Email</th>
+                                <th style={{ padding: '20px', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Registered At</th>
+                                <th style={{ padding: '20px', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             {attendees.map((a, i) => (
-                                <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                <tr key={i} style={{ borderBottom: '1px solid var(--card-border)' }}>
                                     <td style={{ padding: '20px', fontWeight: '600' }}>{a.userName}</td>
                                     <td style={{ padding: '20px', opacity: 0.7, fontFamily: 'monospace' }}>{a.userEmail}</td>
                                     <td style={{ padding: '20px', opacity: 0.5, fontSize: '0.9rem' }}>{new Date(a.registeredAt).toLocaleString()}</td>

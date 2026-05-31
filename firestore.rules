@@ -8,59 +8,146 @@ service cloud.firestore {
       return request.auth != null;
     }
     
+    // Check if user is the specific user
+    function isUser(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
     function isPlatformAdmin() {
       return isAuthenticated() && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'platform_admin';
     }
 
-    function isCollegeAdmin(collegeId) {
+    // Check if user is admin of the club (stored in adminIds array on the club document)
+    function isClubAdmin(clubId) {
        return isAuthenticated() && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.homeCollegeId == collegeId &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'college_admin';
+         request.auth.uid in get(/databases/$(database)/documents/clubs/$(clubId)).data.adminIds;
     }
 
-    // Users Collection
+    // --- Users Collection ---
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && request.auth.uid == userId; // Users can edit their own profile
+      // Allow users to update their own profile
+      allow write: if isUser(userId);
+      
+      // Certificates Subcollection (nested in users)
+      match /certificates/{certId} {
+        allow read: if isAuthenticated();
+        // Allow club admins or platform admins to issue certificates (simplified)
+        allow write: if isAuthenticated(); 
+      }
+      
+      // User Registrations Subcollection (nested in users for quick profile access)
+      match /registrations/{regId} {
+          allow read: if isAuthenticated();
+          allow write: if isUser(userId) || isPlatformAdmin();
+      }
     }
 
-    // Colleges Collection
+    // --- Colleges Collection ---
     match /colleges/{collegeId} {
       allow read: if true;
-      allow write: if isPlatformAdmin(); // Only platform super-admins can create colleges
+      allow create: if isAuthenticated(); // Allow new admins to register their college
+      allow update, delete: if isPlatformAdmin();
+    }
 
-      // Clubs Subcollection
-      match /clubs/{clubId} {
-        allow read: if true;
-        allow write: if isCollegeAdmin(collegeId);
+    // --- Clubs Collection (Root Level) ---
+    match /clubs/{clubId} {
+      allow read: if true;
+      allow create: if isAuthenticated(); // Simplified for MVP
+      allow update: if isClubAdmin(clubId) || isPlatformAdmin() || (isAuthenticated() && request.auth.token.email == resource.data.adminEmail);
+      allow delete: if isPlatformAdmin();
 
-        // Events Subcollection
-        match /events/{eventId} {
-          allow read: if true;
-          // Only Club Admins listed in the parent club can write events
-          allow write: if isAuthenticated() && 
-            request.auth.uid in get(/databases/$(database)/documents/colleges/$(collegeId)/clubs/$(clubId)).data.adminIds;
-
-          // Registrations Subcollection
-          match /registrations/{regId} {
-            // Users can read their own registration
-            allow read: if isAuthenticated() && (
-              resource.data.userId == request.auth.uid || 
-              // Or if they are a club admin
-              request.auth.uid in get(/databases/$(database)/documents/colleges/$(collegeId)/clubs/$(clubId)).data.adminIds
-            );
-            
-            // Users can create a registration for themselves
-            allow create: if isAuthenticated() && 
-              request.resource.data.userId == request.auth.uid;
-              
-            // Only admins can update (e.g., mark attendance)
-            allow update: if isAuthenticated() && 
-               request.auth.uid in get(/databases/$(database)/documents/colleges/$(collegeId)/clubs/$(clubId)).data.adminIds;
-          }
-        }
+      // Members Subcollection
+      match /members/{memberId} {
+          allow read: if true; // Public can see members? Or maybe just internal. Let's say true for now.
+          allow write: if isClubAdmin(clubId) || isPlatformAdmin();
       }
+
+      // Whitelist Subcollection (Added for Role Based Access)
+      match /whitelisted_emails/{emailId} {
+          allow read: if true; // Signup page needs to check this
+          allow write: if isClubAdmin(clubId) || isPlatformAdmin();
+      }
+    }
+
+    // --- Events Collection (Root Level) ---
+    match /events/{eventId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      
+      allow update: if isAuthenticated() && (
+         // Allow students to increment attendeeCount (registration) - Check FIRST to avoid short-circuit errors
+         (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendeeCount'])) ||
+         isPlatformAdmin() || 
+         resource.data.createdBy == request.auth.uid ||
+         request.auth.uid in get(/databases/$(database)/documents/clubs/$(resource.data.clubId)).data.adminIds
+      );
+      
+      allow delete: if isAuthenticated() && (
+         isPlatformAdmin() ||
+         request.auth.uid in get(/databases/$(database)/documents/clubs/$(resource.data.clubId)).data.adminIds
+      );
+
+      // --- Registrations Subcollection (nested in events) ---
+      match /registrations/{regId} {
+         allow read: if isAuthenticated();
+         // Create: Users registering themselves
+         allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+         // Update: User or Admins
+         allow update: if isAuthenticated(); 
+      }
+
+      // --- Feedback Subcollection (nested in events) ---
+      match /feedback/{feedbackId} {
+         // Helper to check if user is admin of THIS event's club
+         function isEventAdmin() {
+            let eventData = get(/databases/$(database)/documents/events/$(eventId)).data;
+            let clubId = eventData.clubId;
+            return isPlatformAdmin() || 
+                   request.auth.uid in get(/databases/$(database)/documents/clubs/$(clubId)).data.adminIds ||
+                   request.auth.uid == eventData.createdBy ||
+                   (
+                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'club_member' &&
+                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.clubId == clubId
+                   );
+         }
+
+         // Read: User can read their own, Admins can read all
+         allow read: if isAuthenticated() && (
+            request.auth.uid == feedbackId || isEventAdmin()
+         );
+
+         // Write: User can write only their own feedback (feedbackId must match their UID)
+         // Note: Code uses userId as document ID for feedback
+         allow write: if isAuthenticated() && request.auth.uid == feedbackId;
+      }
+
+      // --- Announcements Subcollection ---
+      match /announcements/{annId} {
+         allow read: if true;
+         allow create: if isAuthenticated() && (
+            isPlatformAdmin() || 
+            isClubAdmin(get(/databases/$(database)/documents/events/$(eventId)).data.clubId) ||
+            (
+               get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'club_member' &&
+               get(/databases/$(database)/documents/users/$(request.auth.uid)).data.clubId == get(/databases/$(database)/documents/events/$(eventId)).data.clubId
+            )
+         );
+         allow update, delete: if isAuthenticated() && (
+            isPlatformAdmin() ||
+            isClubAdmin(get(/databases/$(database)/documents/events/$(eventId)).data.clubId) ||
+            (resource.data.authorId == request.auth.uid) ||
+            (!('authorId' in resource.data) && resource.data.authorName == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.displayName)
+         );
+      }
+    }
+    // --- Global Notifications Collection ---
+    match /notifications/{notifId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && (
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['college_admin', 'club_admin', 'club_member', 'platform_admin']
+      );
     }
   }
 }
