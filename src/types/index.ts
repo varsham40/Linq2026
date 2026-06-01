@@ -86,6 +86,14 @@ export interface Event {
     status?: 'UPCOMING' | 'LIVE' | 'ENDED';
     certificatesIssued?: boolean;
     registrationDeadline?: number;
+    isTeamEvent?: boolean;
+    minTeamSize?: number;
+    maxTeamSize?: number;
+    submissionConfig?: {
+        isOpen: boolean;
+        deadline: number;
+        fields: { id: string; label: string; type: 'text' | 'url'; required: boolean }[];
+    };
 }
 
 export interface Certificate {
@@ -150,4 +158,40 @@ export interface Notification {
     createdAt: number;
     authorId?: string;
     authorName?: string;
+}
+
+export interface Team {
+    id: string;
+    eventId: string;
+    name: string;
+    leaderId: string;
+    memberIds: string[]; // includes leaderId
+    members: { uid: string; name: string; email: string }[];
+    status: 'INCOMPLETE' | 'COMPLETE';
+    createdAt: number;
+}
+
+export interface TeamRequest {
+    id: string;
+    teamId: string;
+    teamName: string;
+    eventId: string;
+    senderId: string;
+    senderName: string;
+    receiverId: string;
+    receiverEmail: string;
+    status: 'PENDING' | 'ACCEPTED' | 'DECLINED';
+    createdAt: number;
+}
+
+export interface ProjectSubmission {
+    id: string; // User ID or Team ID
+    eventId: string;
+    isTeamSubmission: boolean;
+    submitterId: string; // The user who submitted
+    submitterName?: string;
+    teamId?: string;
+    teamName?: string;
+    data: Record<string, string>; // Responses to the fields
+    submittedAt: number;
 }

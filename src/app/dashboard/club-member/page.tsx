@@ -7,7 +7,7 @@ import { Event, Club } from '@/types';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LayoutDashboard, Calendar, User, Globe, Instagram, Linkedin, Info, Building, Users, Camera, Download, ScanLine, ArrowUpRight, CheckCircle, BarChart3, Bell, Search } from 'lucide-react';
+import { LayoutDashboard, Calendar, User, Globe, Instagram, Linkedin, Info, Building, Users, Camera, Download, ScanLine, ArrowUpRight, CheckCircle, BarChart3, Bell, Search, FileText, FolderOpen } from 'lucide-react';
 
 type Tab = 'OPERATIONS' | 'EVENTS' | 'PROFILE';
 
@@ -471,9 +471,15 @@ const EventManagementSection = ({ events, user }: { events: Event[], user: any }
                                         </div>
                                     </div>
 
-                                    <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--card-border)', paddingTop: '16px' }}>
-                                        <span style={{ fontSize: '0.95rem', fontWeight: 'bold', color: 'var(--primary)' }}>Manage Event</span>
-                                        <ArrowUpRight size={18} color="var(--primary)" />
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginTop: 'auto', borderTop: '1px solid var(--card-border)', paddingTop: '16px' }}>
+                                        <Link href={`/events/${ev.id}/submissions/config`} onClick={(e) => e.stopPropagation()} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '12px', background: 'var(--input-bg)', borderRadius: '12px', textDecoration: 'none', color: 'var(--fg)', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                                            <div style={{ color: '#fb923c' }}><FileText size={20} /></div>
+                                            CONFIG
+                                        </Link>
+                                        <Link href={`/events/${ev.id}/submissions/view`} onClick={(e) => e.stopPropagation()} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '12px', background: 'var(--input-bg)', borderRadius: '12px', textDecoration: 'none', color: 'var(--fg)', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                                            <div style={{ color: '#ec4899' }}><FolderOpen size={20} /></div>
+                                            VIEW WORK
+                                        </Link>
                                     </div>
                                 </div>
                             </div>

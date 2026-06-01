@@ -11,6 +11,8 @@ import Link from 'next/link';
 import TicketModal from '@/components/TicketModal';
 import Toast from '@/components/Toast';
 import ConfirmModal from '@/components/ConfirmModal';
+import TeamManagement from '@/components/TeamManagement';
+import SoloSubmission from '@/components/SoloSubmission';
 import { Users, BarChart2, MessageSquare, ScanLine, Award, Calendar, Clock, MapPin, StopCircle, User, X, Sparkles, Heart, Quote, Trophy } from 'lucide-react';
 
 type ViewMode = 'details' | 'announcements';
@@ -518,6 +520,18 @@ export default function EventDetailPage({ params }: { params: Promise<{ eventId:
                     </div>
 
                 </div>
+
+                {/* Solo Submission Section */}
+                {!event.isTeamEvent && registration && user && (
+                    <SoloSubmission event={event} user={{ uid: user.uid, displayName: user.displayName || 'Student' }} registration={registration} />
+                )}
+
+                {/* Team Management Section */}
+                {event.isTeamEvent && registration && user && (
+                    <div style={{ marginTop: '40px' }}>
+                        <TeamManagement event={event} user={{ uid: user.uid, displayName: user.displayName || 'Student', email: user.email || '' }} registration={registration} />
+                    </div>
+                )}
 
                 {/* Wall of Love Link Banner */}
                 {(event as any).recapData?.published && (

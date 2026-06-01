@@ -30,7 +30,10 @@ export default function CreateEventPage() {
         registrationEndDate: '',
         registrationEndTime: '',
         venue: '',
-        posterURL: ''
+        posterURL: '',
+        isTeamEvent: false,
+        minTeamSize: 1,
+        maxTeamSize: 4
     });
 
     useEffect(() => {
@@ -47,7 +50,8 @@ export default function CreateEventPage() {
     }, [user, router]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const value = e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value;
+        setFormData({ ...formData, [e.target.name]: value });
     };
 
     const handleScopeToggle = (scope: EventScope) => {
@@ -86,7 +90,10 @@ export default function CreateEventPage() {
                 posterURL: formData.posterURL,
                 createdBy: user.uid,
                 createdAt: Date.now(),
-                attendeeCount: 0
+                attendeeCount: 0,
+                isTeamEvent: formData.isTeamEvent,
+                minTeamSize: formData.isTeamEvent ? Number(formData.minTeamSize) : null,
+                maxTeamSize: formData.isTeamEvent ? Number(formData.maxTeamSize) : null
             };
 
             await addDoc(collection(db, 'events'), eventData);
@@ -224,6 +231,34 @@ export default function CreateEventPage() {
                                         <input name="venue" style={{...inputStyle, paddingLeft: '48px'}} placeholder="e.g. Innovation Lab, Block A" onChange={handleChange} value={formData.venue} />
                                     </div>
                                 </div>
+                            </div>
+
+                            <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: '24px', marginTop: '8px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                                    <div>
+                                        <h3 style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--fg)', margin: 0 }}>Team Event Settings</h3>
+                                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>Allow participants to form teams for this event.</p>
+                                    </div>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '50px', height: '28px' }}>
+                                        <input type="checkbox" name="isTeamEvent" checked={formData.isTeamEvent} onChange={handleChange} style={{ opacity: 0, width: 0, height: 0 }} />
+                                        <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: formData.isTeamEvent ? 'var(--primary)' : 'var(--card-border)', transition: '.4s', borderRadius: '34px' }}>
+                                            <span style={{ position: 'absolute', content: '""', height: '20px', width: '20px', left: formData.isTeamEvent ? '26px' : '4px', bottom: '4px', backgroundColor: 'white', transition: '.4s', borderRadius: '50%' }}></span>
+                                        </span>
+                                    </label>
+                                </div>
+
+                                {formData.isTeamEvent && (
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', animation: 'fadeIn 0.2s ease-out' }}>
+                                        <div>
+                                            <label style={labelStyle}>Minimum Team Size</label>
+                                            <input name="minTeamSize" type="number" min="1" style={inputStyle} onChange={handleChange} value={formData.minTeamSize} />
+                                        </div>
+                                        <div>
+                                            <label style={labelStyle}>Maximum Team Size</label>
+                                            <input name="maxTeamSize" type="number" min="1" style={inputStyle} onChange={handleChange} value={formData.maxTeamSize} />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

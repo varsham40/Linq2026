@@ -44,6 +44,11 @@ service cloud.firestore {
       }
     }
 
+    // --- Certificates CollectionGroup (needed for admin dashboard count) ---
+    match /{path=**}/certificates/{certId} {
+        allow read: if isAuthenticated();
+    }
+
     // --- Colleges Collection ---
     match /colleges/{collegeId} {
       allow read: if true;
@@ -81,7 +86,11 @@ service cloud.firestore {
          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendeeCount'])) ||
          isPlatformAdmin() || 
          resource.data.createdBy == request.auth.uid ||
-         request.auth.uid in get(/databases/$(database)/documents/clubs/$(resource.data.clubId)).data.adminIds
+         request.auth.uid in get(/databases/$(database)/documents/clubs/$(resource.data.clubId)).data.adminIds ||
+         (
+            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'club_member' &&
+            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.clubId == resource.data.clubId
+         )
       );
       
       allow delete: if isAuthenticated() && (
@@ -140,6 +149,26 @@ service cloud.firestore {
             (resource.data.authorId == request.auth.uid) ||
             (!('authorId' in resource.data) && resource.data.authorName == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.displayName)
          );
+      }
+
+      // --- Teams Subcollection ---
+      match /teams/{teamId} {
+         allow read: if isAuthenticated();
+         // Basic security: allow authenticated users to interact with teams
+         allow write: if isAuthenticated();
+      }
+
+      // --- Team Requests Subcollection ---
+      match /teamRequests/{requestId} {
+         allow read: if isAuthenticated();
+         // Basic security: allow authenticated users to interact with team requests
+         allow write: if isAuthenticated();
+      }
+
+      // --- Submissions Subcollection ---
+      match /submissions/{submissionId} {
+         allow read: if isAuthenticated(); // Admins and users can read
+         allow write: if isAuthenticated(); // Users can write their submissions
       }
     }
     // --- Global Notifications Collection ---

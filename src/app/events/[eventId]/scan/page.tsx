@@ -99,7 +99,6 @@ export default function ScanPage() {
             // Check if already attended
             const snap = await getDoc(regRef);
             if (snap.exists() && snap.data().attended) {
-                alert("Already marked as attended!");
                 setStatus('ERROR');
                 setMessage(`Already Scanned: ${snap.data().userName}`);
                 setScannedUid(null);
@@ -122,9 +121,6 @@ export default function ScanPage() {
             }
 
             // Success Feedback
-            // User requested: "give a pop of done"
-            alert("Done! Attendance Marked.");
-
             setStatus('SUCCESS');
             setMessage(`Verified & Marked!`);
 

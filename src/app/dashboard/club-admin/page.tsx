@@ -8,7 +8,7 @@ import { collection, query, where, getDocs, doc, getDoc, collectionGroup } from 
 import { db } from '@/lib/firebase';
 import { Club, Event } from '@/types';
 import { endEvent, generateCertificates } from '@/lib/club-utils';
-import { Calendar, Users, Megaphone, Edit2, BarChart2, MessageSquare, Award, PlusCircle, ExternalLink, Settings, StopCircle, Radio, MapPin, Search } from 'lucide-react';
+import { Calendar, Users, Megaphone, Edit2, BarChart2, MessageSquare, Award, PlusCircle, ExternalLink, Settings, StopCircle, Radio, MapPin, Search, FileText, FolderOpen } from 'lucide-react';
 
 const SAMPLE_IMAGES = [
     "https://img.freepik.com/free-vector/cloud-services-isometric-composition-with-small-figures-people-with-computer-screens_1284-30497.jpg?t=st=1767964951~exp=1767968551~hmac=a838f4281bc60e4ece2d61e9552f22de1637384ea5eb3c2d0cd1886d369671af",
@@ -305,7 +305,7 @@ const AdminEventSections = ({ filteredEvents, setEvents, setCertsCount, router }
                                     </div>
 
                                     {/* Action Icons Grid */}
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '24px' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '24px' }}>
                                         <Link href={`/events/${event.id}/edit`} className="action-btn">
                                             <div style={{ color: '#a855f7' }}><Edit2 size={20} /></div>
                                             EDIT
@@ -321,6 +321,14 @@ const AdminEventSections = ({ filteredEvents, setEvents, setCertsCount, router }
                                         <Link href={`/events/${event.id}/feedback`} className="action-btn">
                                             <div style={{ color: '#f43f5e' }}><MessageSquare size={20} /></div>
                                             FEEDBACK
+                                        </Link>
+                                        <Link href={`/events/${event.id}/submissions/config`} className="action-btn">
+                                            <div style={{ color: '#fb923c' }}><FileText size={20} /></div>
+                                            SUBMISSIONS
+                                        </Link>
+                                        <Link href={`/events/${event.id}/submissions/view`} className="action-btn">
+                                            <div style={{ color: '#ec4899' }}><FolderOpen size={20} /></div>
+                                            VIEW WORK
                                         </Link>
                                     </div>
 

@@ -33,7 +33,10 @@ export default function EditEventPage({ params }: { params: Promise<{ eventId: s
         registrationEndDate: '',
         registrationEndTime: '',
         venue: '',
-        posterURL: ''
+        posterURL: '',
+        isTeamEvent: false,
+        minTeamSize: 1,
+        maxTeamSize: 4
     });
 
     useEffect(() => {
@@ -85,7 +88,10 @@ export default function EditEventPage({ params }: { params: Promise<{ eventId: s
                                 registrationEndDate: deadlineDate ? deadlineDate.toISOString().split('T')[0] : '',
                                 registrationEndTime: deadlineDate ? deadlineDate.toTimeString().slice(0, 5) : '',
                                 venue: eventData.venue,
-                                posterURL: eventData.posterURL || ''
+                                posterURL: eventData.posterURL || '',
+                                isTeamEvent: eventData.isTeamEvent || false,
+                                minTeamSize: eventData.minTeamSize || 1,
+                                maxTeamSize: eventData.maxTeamSize || 4
                             });
                         } else {
                             setToast({ message: 'You are not authorized to edit this event', type: 'error' });
@@ -106,7 +112,8 @@ export default function EditEventPage({ params }: { params: Promise<{ eventId: s
     }, [user, eventId, router]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const value = e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value;
+        setFormData({ ...formData, [e.target.name]: value });
     };
 
     const handleSubmit = async () => {
@@ -138,7 +145,10 @@ export default function EditEventPage({ params }: { params: Promise<{ eventId: s
                 venue: formData.venue,
                 posterURL: formData.posterURL,
                 updatedAt: Date.now(),
-                updatedBy: user.uid
+                updatedBy: user.uid,
+                isTeamEvent: formData.isTeamEvent,
+                minTeamSize: formData.isTeamEvent ? Number(formData.minTeamSize) : null,
+                maxTeamSize: formData.isTeamEvent ? Number(formData.maxTeamSize) : null
             };
 
             await updateDoc(doc(db, 'events', event.id), updateData);
@@ -322,6 +332,35 @@ export default function EditEventPage({ params }: { params: Promise<{ eventId: s
                                 placeholder="https://example.com/poster.jpg"
                                 style={inputStyle}
                             />
+                        </div>
+
+                        {/* Team Event Settings */}
+                        <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: '24px', marginTop: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                                <div>
+                                    <h3 style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--fg)', margin: 0 }}>Team Event Settings</h3>
+                                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>Allow participants to form teams for this event.</p>
+                                </div>
+                                <label style={{ position: 'relative', display: 'inline-block', width: '50px', height: '28px' }}>
+                                    <input type="checkbox" name="isTeamEvent" checked={formData.isTeamEvent} onChange={handleChange} style={{ opacity: 0, width: 0, height: 0 }} />
+                                    <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: formData.isTeamEvent ? '#3b82f6' : 'var(--card-border)', transition: '.4s', borderRadius: '34px' }}>
+                                        <span style={{ position: 'absolute', content: '""', height: '20px', width: '20px', left: formData.isTeamEvent ? '26px' : '4px', bottom: '4px', backgroundColor: 'white', transition: '.4s', borderRadius: '50%' }}></span>
+                                    </span>
+                                </label>
+                            </div>
+
+                            {formData.isTeamEvent && (
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', animation: 'fadeIn 0.2s ease-out' }}>
+                                    <div>
+                                        <label style={labelStyle}>Minimum Team Size</label>
+                                        <input name="minTeamSize" type="number" min="1" style={inputStyle} onChange={handleChange} value={formData.minTeamSize} />
+                                    </div>
+                                    <div>
+                                        <label style={labelStyle}>Maximum Team Size</label>
+                                        <input name="maxTeamSize" type="number" min="1" style={inputStyle} onChange={handleChange} value={formData.maxTeamSize} />
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Action Buttons */}
