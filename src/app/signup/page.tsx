@@ -226,7 +226,7 @@ export default function SignupPage() {
 
                 {/* Role Toggles */}
                 <div style={{ display: 'flex', background: 'rgba(0,0,0,0.3)', padding: '4px', borderRadius: '12px', marginBottom: '1.5rem' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '5px', width: '100%' }}>
+                    <div className="mobile-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '5px', width: '100%' }}>
                         {(['student', 'club_member', 'club_admin', 'college_admin'] as const).map(r => (
                             <button
                                 key={r}
@@ -278,7 +278,7 @@ export default function SignupPage() {
                 {error && <div style={{ color: '#f87171', fontSize: '0.9rem', marginBottom: '1rem', background: 'rgba(248,113,113,0.1)', padding: '0.5rem', borderRadius: '8px' }}>{error}</div>}
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', textAlign: 'left' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+                    <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
                         <input name="firstName" placeholder="First Name" className="input-fld" onChange={handleInputChange} />
                         <input name="lastName" placeholder="Last Name" className="input-fld" onChange={handleInputChange} />
                     </div>
@@ -290,7 +290,7 @@ export default function SignupPage() {
 
                     {/* Role Specific Fields */}
                     {role === 'student' && (
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+                        <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
                             <input name="rollNumber" placeholder="Roll Number" className="input-fld" onChange={handleInputChange} />
                             <input name="branch" placeholder="Branch (e.g. CSE)" className="input-fld" onChange={handleInputChange} />
                         </div>

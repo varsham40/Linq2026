@@ -7,7 +7,7 @@ import { Event, Club } from '@/types';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LayoutDashboard, Calendar, User, Globe, Instagram, Linkedin, Info, Building, Users, Camera, Download, ScanLine, ArrowUpRight, CheckCircle, BarChart3, Bell, Search, FileText, FolderOpen } from 'lucide-react';
+import { LayoutDashboard, Calendar, User, Globe, Instagram, Linkedin, Info, Building, Users, Camera, Download, ScanLine, ArrowUpRight, CheckCircle, BarChart3, Bell, Search, FileText, FolderOpen, Menu, X } from 'lucide-react';
 
 type Tab = 'OPERATIONS' | 'EVENTS' | 'PROFILE';
 
@@ -24,6 +24,7 @@ export default function ClubMemberDashboard() {
     const [activeTab, setActiveTab] = useState<Tab>('OPERATIONS');
     const [totalAttendees, setTotalAttendees] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
     useEffect(() => {
         if (!user) return;
@@ -133,58 +134,54 @@ export default function ClubMemberDashboard() {
     });
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--fg)', fontFamily: 'var(--font-inter)', transition: 'background-color 0.3s' }}>
+        <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--fg)', fontFamily: 'var(--font-inter)', transition: 'background-color 0.3s ease, color 0.3s ease' }}>
             <Navbar />
             
-            <main style={{ maxWidth: '1600px', margin: '0 auto', padding: '100px 24px 80px', display: 'flex', gap: '32px' }}>
+            <main className="dashboard-layout" style={{ maxWidth: '1600px', margin: '0 auto', padding: '100px 24px 80px', display: 'flex', gap: '32px' }}>
                 
+                {isMobileSidebarOpen && (
+                    <div className="sidebar-overlay" onClick={() => setIsMobileSidebarOpen(false)}></div>
+                )}
+
                 {/* VERTICAL SIDEBAR */}
-                <div style={{ width: '80px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', paddingTop: '16px' }}>
+                <div className={`dashboard-sidebar ${isMobileSidebarOpen ? 'open' : ''}`}>
+                    <div className="mobile-only" style={{ alignSelf: 'flex-end', marginBottom: '20px', cursor: 'pointer', padding: '8px' }} onClick={() => setIsMobileSidebarOpen(false)}>
+                        <X size={24} color="var(--text-muted)" />
+                    </div>
                     <button
-                        onClick={() => setActiveTab('OPERATIONS')}
-                        style={{
-                            width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            background: activeTab === 'OPERATIONS' ? 'var(--primary)' : 'var(--card-bg)',
-                            color: activeTab === 'OPERATIONS' ? '#fff' : 'var(--text-muted)',
-                            border: '1px solid var(--card-border)', cursor: 'pointer', transition: 'all 0.2s',
-                            boxShadow: activeTab === 'OPERATIONS' ? '0 4px 16px rgba(192, 132, 252, 0.4)' : 'none'
-                        }}
+                        onClick={() => { setActiveTab('OPERATIONS'); setIsMobileSidebarOpen(false); }}
+                        className={activeTab === 'OPERATIONS' ? 'active' : ''}
                         title="Operations Dashboard"
                     >
                         <LayoutDashboard size={24} />
+                        <span className="mobile-only">Operations Dashboard</span>
                     </button>
 
                     <button
-                        onClick={() => setActiveTab('EVENTS')}
-                        style={{
-                            width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            background: activeTab === 'EVENTS' ? 'var(--primary)' : 'var(--card-bg)',
-                            color: activeTab === 'EVENTS' ? '#fff' : 'var(--text-muted)',
-                            border: '1px solid var(--card-border)', cursor: 'pointer', transition: 'all 0.2s',
-                            boxShadow: activeTab === 'EVENTS' ? '0 4px 16px rgba(192, 132, 252, 0.4)' : 'none'
-                        }}
+                        onClick={() => { setActiveTab('EVENTS'); setIsMobileSidebarOpen(false); }}
+                        className={activeTab === 'EVENTS' ? 'active' : ''}
                         title="Events Management"
                     >
                         <Calendar size={24} />
+                        <span className="mobile-only">Events Management</span>
                     </button>
 
                     <button
-                        onClick={() => setActiveTab('PROFILE')}
-                        style={{
-                            width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            background: activeTab === 'PROFILE' ? 'var(--primary)' : 'var(--card-bg)',
-                            color: activeTab === 'PROFILE' ? '#fff' : 'var(--text-muted)',
-                            border: '1px solid var(--card-border)', cursor: 'pointer', transition: 'all 0.2s',
-                            boxShadow: activeTab === 'PROFILE' ? '0 4px 16px rgba(192, 132, 252, 0.4)' : 'none'
-                        }}
+                        onClick={() => { setActiveTab('PROFILE'); setIsMobileSidebarOpen(false); }}
+                        className={activeTab === 'PROFILE' ? 'active' : ''}
                         title="My Profile"
                     >
                         <User size={24} />
+                        <span className="mobile-only">My Profile</span>
                     </button>
                 </div>
 
                 {/* MAIN CONTENT AREA */}
-                <div style={{ flex: 1, paddingLeft: '16px' }}>
+                <div className="dashboard-content" style={{ flex: 1 }}>
+
+                    <button className="mobile-sidebar-hamburger" onClick={() => setIsMobileSidebarOpen(true)}>
+                        <Menu size={20} /> <span>Menu</span>
+                    </button>
 
                     {/* 1. OPERATIONS */}
                     {activeTab === 'OPERATIONS' && (

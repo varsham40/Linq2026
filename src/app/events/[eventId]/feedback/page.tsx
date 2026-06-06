@@ -28,9 +28,9 @@ export default function FeedbackPage() {
     const [isAdmin, setIsAdmin] = useState(false);
 
     // Multi-step Feedback State
-    const [step, setStep] = useState<number>(0); 
+    const [step, setStep] = useState<number>(0);
     // 0 = Rating, 1 = Comment, 2 = Success
-    
+
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
     const [submitting, setSubmitting] = useState(false);
@@ -79,7 +79,7 @@ export default function FeedbackPage() {
                     if (clubSnap.exists() && clubSnap.data().adminIds?.includes(user.uid)) {
                         isEventAdmin = true;
                     }
-                } 
+                }
                 if (userData?.role === 'club_member' && userData?.clubId === eventData.clubId) {
                     isEventAdmin = true;
                 }
@@ -97,7 +97,8 @@ export default function FeedbackPage() {
                         setLoading(false);
                         return;
                     }
-                    if (eventData.status !== 'ENDED') {
+                    const isEventEnded = eventData.status === 'ENDED' || new Date(eventData.endTime).getTime() < Date.now();
+                    if (!isEventEnded) {
                         setAccessDenied("Feedback will unlock once the event has ended.");
                         setLoading(false);
                         return;
@@ -151,7 +152,7 @@ export default function FeedbackPage() {
 
     if (loading) return <div className="min-h-screen flex items-center justify-center text-white">Loading...</div>;
     if (!event) return <div className="min-h-screen flex items-center justify-center text-white">Event not found</div>;
-    
+
     if (accessDenied && !isAdmin) {
         return (
             <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--fg)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-inter)' }}>
@@ -170,16 +171,16 @@ export default function FeedbackPage() {
     return (
         <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--fg)', fontFamily: 'var(--font-inter)', transition: 'background-color 0.3s ease' }}>
             <Navbar />
-            
+
             <main style={{ maxWidth: isAdmin ? '1000px' : '600px', margin: '0 auto', padding: '120px 24px 80px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                
+
                 {isAdmin ? (
                     // ADMIN VIEW: Structured Feedbacks
                     <div style={{ width: '100%' }}>
                         <Link href={`/events/${eventId}/analytics`} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', marginBottom: '24px', textDecoration: 'none', fontWeight: 'bold' }}>
                             <ArrowLeft size={16} /> Back to Analytics
                         </Link>
-                        
+
                         <div style={{ marginBottom: '40px' }}>
                             <h1 style={{ fontSize: '2.5rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '8px' }}>
                                 Attendee Feedback
@@ -221,10 +222,10 @@ export default function FeedbackPage() {
                 ) : (
                     // STUDENT VIEW: Cute Multi-step Form
                     <div style={{ width: '100%', maxWidth: '420px', animation: 'slideUp 0.3s ease-out' }}>
-                        
+
                         {/* Interactive Card */}
                         <div style={{ background: 'var(--card-bg)', borderRadius: '32px', border: '1px solid var(--card-border)', boxShadow: '0 20px 40px rgba(0,0,0,0.08), var(--card-glow)', overflow: 'hidden', position: 'relative' }}>
-                            
+
                             {/* Card Header */}
                             <div style={{ padding: '32px 32px 16px', position: 'relative' }}>
                                 {step === 1 && (
@@ -247,7 +248,7 @@ export default function FeedbackPage() {
 
                             {/* Card Body */}
                             <div style={{ padding: '0 32px 32px' }}>
-                                
+
                                 {/* Step 0: Emoji Ratings */}
                                 {step === 0 && (
                                     <div style={{ animation: 'fadeIn 0.3s ease' }}>
@@ -256,7 +257,7 @@ export default function FeedbackPage() {
                                         </p>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                                             {EMOJI_RATINGS.map((r) => (
-                                                <button 
+                                                <button
                                                     key={r.value}
                                                     onClick={() => handleRatingSelect(r.value)}
                                                     style={{ display: 'flex', alignItems: 'center', gap: '16px', width: '100%', padding: '16px 20px', background: 'var(--bg)', border: '1px solid var(--card-border)', borderRadius: '16px', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left' }}
@@ -277,7 +278,7 @@ export default function FeedbackPage() {
                                         <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '24px', lineHeight: '1.5' }}>
                                             We love to hear from you! How's your experience with <strong style={{ color: 'var(--primary)' }}>{event.title}</strong>?
                                         </p>
-                                        
+
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
                                             <div style={{ fontSize: '2.5rem', lineHeight: '1', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.15))' }}>
                                                 {getEmojiForRating(rating)}
@@ -336,7 +337,8 @@ export default function FeedbackPage() {
                 )}
             </main>
 
-            <style dangerouslySetInnerHTML={{__html: `
+            <style dangerouslySetInnerHTML={{
+                __html: `
                 @keyframes slideUp {
                     from { opacity: 0; transform: translateY(20px); }
                     to { opacity: 1; transform: translateY(0); }

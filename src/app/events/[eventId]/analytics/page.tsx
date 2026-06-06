@@ -325,9 +325,16 @@ export default function AnalyticsPage({ params }: { params: Promise<{ eventId: s
     };
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--fg)', fontFamily: 'var(--font-inter)', transition: 'background-color 0.3s ease, color 0.3s ease' }}>
+        <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--fg)', fontFamily: 'var(--font-inter)' }}>
             <Navbar />
-            <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '100px 24px 80px' }}>
+            <style dangerouslySetInnerHTML={{__html: `
+                @media (max-width: 900px) {
+                    .magic-wrapup-header { flex-direction: column; align-items: flex-start !important; gap: 16px; }
+                    .magic-wrapup-grid { grid-template-columns: 1fr !important; }
+                    .magic-wrapup-modal { height: 95vh !important; }
+                }
+            `}} />
+            <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '120px 24px 80px' }}>
 
                 {/* Breadcrumbs */}
                 <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '24px', fontWeight: '500' }}>
@@ -582,10 +589,10 @@ export default function AnalyticsPage({ params }: { params: Promise<{ eventId: s
             {/* AI Magic Wrap-up Modal */}
             {isWrapUpModalOpen && (
                 <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-                    <div style={{ background: 'var(--card-bg)', width: '100%', maxWidth: '1200px', height: '90vh', borderRadius: '32px', border: '1px solid var(--card-border)', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', position: 'relative', animation: 'fadeIn 0.2s ease-out', overflow: 'hidden' }}>
+                    <div className="magic-wrapup-modal" style={{ background: 'var(--card-bg)', width: '100%', maxWidth: '1200px', height: '90vh', borderRadius: '32px', border: '1px solid var(--card-border)', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', position: 'relative', animation: 'fadeIn 0.2s ease-out', overflow: 'hidden' }}>
                         
                         {/* Header */}
-                        <div style={{ padding: '32px', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg)' }}>
+                        <div className="magic-wrapup-header" style={{ padding: '32px', borderBottom: '1px solid var(--card-border)', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'linear-gradient(135deg, var(--primary), var(--accent))', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <Sparkles size={24} />
@@ -621,7 +628,7 @@ export default function AnalyticsPage({ params }: { params: Promise<{ eventId: s
                         {/* Content */}
                         <div style={{ flex: 1, overflowY: 'auto', padding: '32px', background: 'var(--bg)' }}>
                             {recapData ? (
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+                                <div className="magic-wrapup-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
                                     
                                     {/* Left: Social Media Recaps */}
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>

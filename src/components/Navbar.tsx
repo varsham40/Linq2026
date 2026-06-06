@@ -3,14 +3,16 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter, usePathname } from 'next/navigation';
 import { useTheme } from '@/lib/theme-context';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Menu, X } from 'lucide-react';
 import NotificationsDropdown from './NotificationsDropdown';
+import { useState } from 'react';
 
 export default function Navbar() {
     const { user, profile, logout } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
     const { theme, toggleTheme } = useTheme();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const handleBack = () => {
         router.back();
@@ -23,12 +25,15 @@ export default function Navbar() {
         } else {
             router.push(path);
         }
+        setIsMobileMenuOpen(false);
     };
+
+    const isDashboard = pathname.startsWith('/dashboard') || pathname.startsWith('/clubs/');
 
     return (
         <nav className="navbar">
             <div className="container">
-                <div className="glass-panel navbar-content">
+                <div className="navbar-content glass-panel">
                     {/* Logo & Back Button */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', color: 'var(--fg)' }}>
@@ -60,8 +65,9 @@ export default function Navbar() {
                                     alignItems: 'center',
                                     gap: '5px'
                                 }}
+                                className="mobile-hide-text"
                             >
-                                ← Back
+                                <span>←</span> <span className="desktop-text">Back</span>
                             </button>
                         )}
                     </div>
@@ -98,7 +104,7 @@ export default function Navbar() {
                     )}
 
                     {/* Actions */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }} className="mobile-gap-2">
                         {user && <NotificationsDropdown />}
                         
                         <button onClick={toggleTheme} style={{ background: 'var(--hover-bg)', border: '1px solid var(--glass-border)', color: 'var(--fg)', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.2s' }}>
@@ -107,29 +113,60 @@ export default function Navbar() {
 
                         {!user ? (
                             <>
-                                <Link href="/login" style={{ fontSize: '0.9rem' }}>
+                                <Link href="/login" style={{ fontSize: '0.9rem' }} className="hidden-mobile">
                                     Log in
                                 </Link>
-                                <Link href="/signup" className="btn btn-primary" style={{ padding: '0.5rem 1.2rem', fontSize: '0.9rem' }}>
+                                <Link href="/signup" className="btn btn-primary mobile-px-4" style={{ padding: '0.5rem 1.2rem', fontSize: '0.9rem' }}>
                                     Get Started
                                 </Link>
                             </>
                         ) : (
                             <>
-                                <button onClick={() => logout()} style={{ padding: '8px 20px', background: 'var(--hover-bg)', border: '1px solid var(--glass-border)', color: 'var(--fg)', borderRadius: '24px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: '600' }}>
+                                <button onClick={() => logout()} style={{ padding: '8px 20px', background: 'var(--hover-bg)', border: '1px solid var(--glass-border)', color: 'var(--fg)', borderRadius: '24px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: '600' }} className="hidden-mobile">
                                     Logout
                                 </button>
 
                                 {/* Profile Link */}
-                                <Link href="/profile" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+                                <Link href="/profile" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }} className="hidden-mobile">
                                     <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 'bold' }}>
                                         {user.displayName?.charAt(0).toUpperCase() || 'U'}
                                     </div>
                                 </Link>
+
+                                {/* Hamburger Menu */}
+                                <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="mobile-only" style={{ background: 'var(--hover-bg)', border: '1px solid var(--glass-border)', color: 'var(--fg)', width: '36px', height: '36px', borderRadius: '8px', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                                    {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                                </button>
                             </>
                         )}
                     </div>
                 </div>
+                
+                {/* Mobile Menu Dropdown */}
+                {isMobileMenuOpen && user && (
+                    <div className="mobile-only" style={{ position: 'absolute', top: '100%', left: '0', right: '0', background: 'var(--glass-bg)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--glass-border)', padding: '1rem 2rem', flexDirection: 'column', gap: '1rem', zIndex: 90 }}>
+                        <Link href="/" onClick={() => setIsMobileMenuOpen(false)} style={{ fontSize: '1.1rem', color: 'var(--fg)', textDecoration: 'none', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Home
+                        </Link>
+                        <a href="/dashboard" onClick={(e) => handleProtectedClick(e, '/dashboard')} style={{ fontSize: '1.1rem', color: 'var(--fg)', textDecoration: 'none', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg> Dashboard
+                        </a>
+                        {profile?.role === 'club_member' && (
+                            <a href="/dashboard/student" onClick={(e) => handleProtectedClick(e, '/dashboard/student')} style={{ fontSize: '1.1rem', color: 'var(--fg)', textDecoration: 'none', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Events
+                            </a>
+                        )}
+                        <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} style={{ fontSize: '1.1rem', color: 'var(--fg)', textDecoration: 'none', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                                {user.displayName?.charAt(0).toUpperCase() || 'U'}
+                            </div>
+                            Profile
+                        </Link>
+                        <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} style={{ marginTop: '0.5rem', padding: '12px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer', textAlign: 'center' }}>
+                            Logout
+                        </button>
+                    </div>
+                )}
             </div>
         </nav>
     );

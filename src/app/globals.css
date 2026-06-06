@@ -39,6 +39,19 @@
     --card-glow: 0 4px 20px rgba(0, 0, 0, 0.03);
 }
 
+/* Dashboard Layout Fixes */
+.dashboard-layout {
+    display: flex;
+    gap: 32px;
+    padding-left: calc(64px + 32px) !important; /* Sidebar width + gap */
+}
+@media (max-width: 1024px) {
+    .dashboard-layout {
+        flex-direction: column;
+        padding-left: 24px !important; /* Reset on mobile */
+    }
+}
+
 /* Calendar and Time icons */
 input[type="date"],
 input[type="time"] {
@@ -197,6 +210,10 @@ a:hover {
     padding: 0.8rem 2rem;
 }
 
+.dashboard-layout {
+    padding-left: 120px !important; /* Clears the 72px floating sidebar + 24px left margin + 24px gap */
+}
+
 /* Hero */
 .hero-section {
     padding-top: 8rem;
@@ -263,9 +280,381 @@ a:hover {
     border-color: transparent;
 }
 
-/* Grid */
 .grid-3 {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
+}
+
+.mobile-only {
+    display: none !important;
+}
+
+/* Desktop Dashboard Sidebar Default (Floating Modern Pill) */
+.dashboard-sidebar {
+    position: fixed;
+    top: 100px; /* Sits below the floating top navbar */
+    left: 24px; /* Floats off the edge */
+    width: 72px; /* Sleek width */
+    height: calc(100vh - 124px); /* Gap at the bottom */
+    background: var(--glass-bg); /* Glassmorphism to match top navbar */
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px; /* Floating pill shape */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    padding-top: 24px;
+    z-index: 60;
+}
+
+.dashboard-sidebar button {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 14px !important;
+    background: transparent !important;
+    color: var(--text-muted) !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    position: relative; 
+}
+
+.dashboard-sidebar button:hover {
+    color: var(--fg) !important;
+    background: var(--hover-bg) !important;
+    transform: scale(1.05); /* Modern micro-interaction */
+}
+
+.dashboard-sidebar button.active {
+    color: var(--primary) !important;
+    background: rgba(192, 132, 252, 0.1) !important; /* Subtle premium tint */
+    box-shadow: inset 0 0 0 1px rgba(192, 132, 252, 0.3) !important; /* Elegant inner glow border */
+}
+
+.mobile-sidebar-hamburger {
+    display: none;
+}
+.sidebar-overlay {
+    display: none;
+}
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 1024px) {
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .hidden-mobile {
+        display: none !important;
+    }
+
+    .mobile-only {
+        display: flex !important;
+    }
+
+    .notifications-dropdown {
+        position: fixed !important;
+        top: 80px !important;
+        right: 50% !important;
+        transform: translateX(50%) !important;
+        width: 90vw !important;
+        max-width: 400px !important;
+    }
+
+    .mobile-sidebar-hamburger {
+        display: none !important; /* Hide completely on mobile as we now use bottom nav */
+    }
+
+    .dashboard-sidebar {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        background: var(--glass-bg) !important; /* Proper glassmorphism */
+        backdrop-filter: blur(20px);
+        border-right: none !important;
+        border-top: 1px solid var(--glass-border) !important;
+        z-index: 2000 !important;
+        transition: none !important;
+        padding: 10px 8px 16px 8px !important; /* Sleek, compact padding */
+        box-shadow: 0 -4px 30px rgba(0,0,0,0.05) !important; /* Subtle shadow */
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        border-radius: 0 !important; /* Flat edges look native on mobile */
+    }
+    
+    .dashboard-sidebar.open {
+        left: 0 !important;
+    }
+
+    .sidebar-overlay {
+        display: none !important; /* Not needed for bottom nav */
+    }
+
+    .dashboard-sidebar > div.mobile-only {
+        display: none !important; /* Hide the "X" close button */
+    }
+
+    .dashboard-sidebar button {
+        width: auto !important;
+        height: auto !important;
+        justify-content: center !important;
+        padding: 4px !important;
+        flex-direction: column !important; /* Stack icon and text */
+        gap: 4px !important; /* Tighter gap */
+        border-radius: 0 !important;
+        color: var(--text-muted) !important;
+        margin-bottom: 0 !important;
+        flex: 1 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    
+    .dashboard-sidebar button:hover {
+        transform: none !important;
+    }
+    
+    .dashboard-sidebar button span {
+        font-size: 0.65rem !important; /* Smaller, sharper text */
+        font-weight: 500 !important;
+        display: block !important;
+        color: inherit !important;
+    }
+    
+    .dashboard-sidebar button.active {
+        color: var(--primary) !important;
+        background: transparent !important; /* Keep transparent, use color highlight */
+    }
+
+    /* Sleek active state without huge background shapes */
+    .dashboard-sidebar button.active svg {
+        background: transparent !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        width: 24px !important;
+        height: 24px !important;
+        margin-top: 0 !important; 
+        transform: scale(1.15) !important; /* Modern native scale */
+        filter: drop-shadow(0 2px 8px rgba(192, 132, 252, 0.4)) !important; /* Glowing icon */
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .dashboard-sidebar button.active::before {
+        display: none !important; 
+    }
+
+    .mobile-col {
+        flex-direction: column !important;
+    }
+
+    .mobile-col-reverse {
+        flex-direction: column-reverse !important;
+    }
+
+    .mobile-gap-4 {
+        gap: 1rem !important;
+    }
+
+    .mobile-gap-2 {
+        gap: 0.5rem !important;
+    }
+
+    .mobile-text-center {
+        text-align: center !important;
+    }
+
+    .mobile-full-width {
+        width: 100% !important;
+    }
+
+    .mobile-px-4 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    .mobile-py-8 {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+
+
+
+    .dashboard-layout {
+        flex-direction: column !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-bottom: 120px !important; /* Space for bottom nav */
+    }
+
+    .dashboard-content {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    /* Landing Page Responsiveness Utilities */
+    .landing-h1 {
+        font-size: 2.8rem !important;
+        line-height: 1.1 !important;
+    }
+    
+    .landing-h2 {
+        font-size: 2.2rem !important;
+        line-height: 1.1 !important;
+    }
+    
+    .landing-p {
+        font-size: 1rem !important;
+        padding: 0 16px !important;
+    }
+    
+    .landing-section {
+        padding: 60px 16px !important;
+    }
+    
+    .landing-grid {
+        grid-template-columns: 1fr !important;
+        gap: 32px !important;
+    }
+    
+    .landing-bento {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+    
+    .landing-buttons {
+        flex-direction: column !important;
+        width: 100% !important;
+        padding: 0 16px !important;
+    }
+    
+    .landing-buttons button, .landing-buttons a {
+        width: 100% !important;
+        display: block !important;
+        text-align: center !important;
+        justify-content: center !important;
+    }
+    
+    .landing-mockup {
+        height: 350px !important;
+        margin-top: 40px !important;
+    }
+    
+    .landing-mockup-inner {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .landing-mockup-hide {
+        display: none !important;
+    }
+
+    .landing-timeline {
+        flex-direction: column !important;
+        gap: 32px !important;
+        align-items: flex-start !important;
+        padding-left: 16px !important;
+    }
+    
+    .landing-timeline > div.step-item {
+        flex-direction: row !important; 
+        width: 100% !important;
+        text-align: left !important;
+        align-items: center !important;
+    }
+    
+    .landing-timeline-line {
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 39px !important; /* 16px padding + 48/2 - 1 */
+        right: auto !important;
+        width: 2px !important;
+        height: 100% !important;
+    }
+
+    .landing-stats {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+    
+    .landing-padding-sm {
+        padding: 24px 16px !important;
+    }
+    
+    .landing-chart {
+        padding: 0 16px !important;
+        height: 200px !important;
+    }
+
+    /* Grids */
+    .mobile-grid-1 {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .mobile-grid-2 {
+        grid-template-columns: 1fr 1fr !important;
+    }
+    
+    .mobile-flex-col {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 16px !important;
+    }
+    
+    .mobile-flex-col > div {
+        width: 100% !important;
+        justify-content: flex-start !important;
+    }
+
+    .mobile-grid-2 {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .mobile-hide-text span.desktop-text {
+        display: none !important;
+    }
+
+    /* Event Info Row */
+    .info-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Event Panel Grid */
+    .panel-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .event-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .team-split {
+        border-left: none !important;
+        padding-left: 0 !important;
+        border-top: 1px solid var(--card-border) !important;
+        padding-top: 1.5rem !important;
+        margin-top: 1.5rem !important;
+    }
+
+    .headline {
+        font-size: 2rem;
+    }
+
+    .subheadline {
+        font-size: 1rem;
+    }
+
+    .hero-section {
+        padding-top: 4rem;
+        padding-bottom: 2rem;
+    }
 }

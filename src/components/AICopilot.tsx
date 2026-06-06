@@ -62,8 +62,10 @@ export default function AICopilot() {
     }
   };
 
+  if (!user) return null;
+
   return (
-    <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+    <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: isOpen ? 2000 : 50, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
       {isOpen && (
         <div 
           style={{ 

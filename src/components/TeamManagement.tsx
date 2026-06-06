@@ -360,7 +360,7 @@ export default function TeamManagement({ event, user, registration }: Props) {
 
             {!myTeam ? (
                 // Not in a team
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+                <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
                     {/* Create Team */}
                     <div>
                         <h3 style={{ fontSize: '1.05rem', fontWeight: 'bold', marginBottom: '16px' }}>Create a New Team</h3>
@@ -384,7 +384,7 @@ export default function TeamManagement({ event, user, registration }: Props) {
                     </div>
 
                     {/* Pending Invites */}
-                    <div style={{ borderLeft: '1px solid var(--card-border)', paddingLeft: '32px' }}>
+                    <div className="team-split" style={{ borderLeft: '1px solid var(--card-border)', paddingLeft: '32px' }}>
                         <h3 style={{ fontSize: '1.05rem', fontWeight: 'bold', marginBottom: '16px' }}>Pending Invites ({pendingRequests.length})</h3>
                         {isRegDeadlinePassed ? (
                             <p style={{ color: '#ef4444', fontSize: '0.9rem', fontWeight: 'bold' }}>Team formations are closed as the deadline has passed.</p>
@@ -409,7 +409,7 @@ export default function TeamManagement({ event, user, registration }: Props) {
             ) : (
                 // In a team
                 <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', paddingBottom: '24px', borderBottom: '1px solid var(--card-border)' }}>
+                    <div className="mobile-flex-col" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', paddingBottom: '24px', borderBottom: '1px solid var(--card-border)' }}>
                         <div>
                             <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '4px' }}>{myTeam.name}</h3>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -458,7 +458,7 @@ export default function TeamManagement({ event, user, registration }: Props) {
                         </div>
                     )}
 
-                    <div style={{ display: 'grid', gridTemplateColumns: myTeam.leaderId === user.uid ? '2fr 1fr' : '1fr', gap: '32px' }}>
+                    <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: myTeam.leaderId === user.uid ? '2fr 1fr' : '1fr', gap: '32px' }}>
                         {/* Members List */}
                         <div>
                             <h4 style={{ fontSize: '1.05rem', fontWeight: 'bold', marginBottom: '16px' }}>Members</h4>
@@ -488,7 +488,7 @@ export default function TeamManagement({ event, user, registration }: Props) {
 
                         {/* Invite Section (Only for Leader) */}
                         {myTeam.leaderId === user.uid && (
-                            <div style={{ borderLeft: '1px solid var(--card-border)', paddingLeft: '32px' }}>
+                            <div className="team-split" style={{ borderLeft: '1px solid var(--card-border)', paddingLeft: '32px' }}>
                                 <h4 style={{ fontSize: '1.05rem', fontWeight: 'bold', marginBottom: '16px' }}>Invite Member</h4>
                                 {isRegDeadlinePassed ? (
                                     <div style={{ padding: '16px', background: 'var(--hover-bg)', borderRadius: '12px', color: '#ef4444', fontSize: '0.9rem', textAlign: 'center', fontWeight: 'bold' }}>

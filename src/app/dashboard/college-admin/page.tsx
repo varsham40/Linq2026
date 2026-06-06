@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Club } from '@/types';
-import { Building, Users, Calendar, Plus, Home, Eye } from 'lucide-react';
+import { Building, Users, Calendar, Plus, Home, Eye, Menu, X } from 'lucide-react';
 
 export default function CollegeAdminDashboard() {
     const { user } = useAuth();
@@ -14,6 +14,7 @@ export default function CollegeAdminDashboard() {
     const [clubs, setClubs] = useState<Club[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('HOME');
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
     useEffect(() => {
         if (!user) return;
@@ -50,32 +51,38 @@ export default function CollegeAdminDashboard() {
     return (
         <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--fg)', fontFamily: 'var(--font-inter)', transition: 'background-color 0.3s ease, color 0.3s ease' }}>
             <Navbar />
-            <main style={{ maxWidth: '1600px', margin: '0 auto', padding: '100px 24px 80px', display: 'flex', gap: '32px' }}>
+            <main className="dashboard-layout" style={{ maxWidth: '1600px', margin: '0 auto', padding: '100px 24px 80px', display: 'flex', gap: '32px' }}>
+
+                {isMobileSidebarOpen && (
+                    <div className="sidebar-overlay" onClick={() => setIsMobileSidebarOpen(false)}></div>
+                )}
 
                 {/* VERTICAL SIDEBAR */}
-                <div style={{ width: '80px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', paddingTop: '16px' }}>
+                <div className={`dashboard-sidebar ${isMobileSidebarOpen ? 'open' : ''}`}>
+                    <div className="mobile-only" style={{ alignSelf: 'flex-end', marginBottom: '20px', cursor: 'pointer', padding: '8px' }} onClick={() => setIsMobileSidebarOpen(false)}>
+                        <X size={24} color="var(--text-muted)" />
+                    </div>
                     {[
                         { id: 'HOME', label: 'Overview', icon: Home },
                     ].map(nav => (
                         <button
                             key={nav.id}
-                            onClick={() => setActiveTab(nav.id)}
-                            style={{
-                                width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                background: activeTab === nav.id ? 'var(--primary)' : 'var(--card-bg)',
-                                color: activeTab === nav.id ? '#fff' : 'var(--text-muted)',
-                                border: '1px solid var(--card-border)', cursor: 'pointer', transition: 'all 0.2s',
-                                boxShadow: activeTab === nav.id ? '0 4px 16px rgba(192, 132, 252, 0.4)' : 'none'
-                            }}
+                            className={activeTab === nav.id ? 'active' : ''}
+                            onClick={() => { setActiveTab(nav.id); setIsMobileSidebarOpen(false); }}
                             title={nav.label}
                         >
                             <nav.icon size={24} />
+                            <span className="mobile-only">{nav.label}</span>
                         </button>
                     ))}
                 </div>
 
                 {/* MAIN CONTENT AREA */}
-                <div style={{ flex: 1, paddingLeft: '16px' }}>
+                <div className="dashboard-content" style={{ flex: 1 }}>
+
+                    <button className="mobile-sidebar-hamburger" onClick={() => setIsMobileSidebarOpen(true)}>
+                        <Menu size={20} /> <span>Menu</span>
+                    </button>
 
                     {/* Header */}
                     <div style={{ marginBottom: '40px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

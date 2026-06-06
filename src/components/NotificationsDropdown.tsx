@@ -148,11 +148,12 @@ export default function NotificationsDropdown() {
             </button>
 
             {isOpen && (
-                <div style={{
+                <div className="notifications-dropdown" style={{
                     position: 'absolute',
                     top: '50px',
                     right: '-10px',
                     width: '380px',
+                    maxWidth: '100vw',
                     maxHeight: '80vh',
                     background: 'var(--card-bg)',
                     border: '1px solid var(--card-border)',

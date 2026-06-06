@@ -136,6 +136,12 @@ Everything a Club Member has, plus:
 - Tied to physical check-in — only actual attendees get certificates
 - Accessible from student profile anytime
 
+### 📱 Mobile-First Premium Design
+- **Native App Feel** — Carefully designed mobile layout with sticky bottom navigation bars for all dashboards
+- **Fluid Layouts** — Sidebars and horizontal layouts gracefully collapse into stacked mobile grids
+- **Premium Aesthetics** — Dark mode out of the box, glassmorphism panels, floating action buttons, and buttery smooth micro-animations
+- **Zero Compromises** — Every single administrative tool, analytics dashboard, and project submission flow works perfectly on mobile devices
+
 ---
 
 ## 💻 Tech Stack

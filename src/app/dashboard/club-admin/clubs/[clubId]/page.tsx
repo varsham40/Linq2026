@@ -7,7 +7,7 @@ import { doc, getDoc, updateDoc, collection, getDocs, query, where, setDoc, dele
 import { db } from '@/lib/firebase';
 import { Club, ClubMember, Event, WhitelistedMember } from '@/types';
 import Link from 'next/link';
-import { Info, Globe, Users, Calendar } from 'lucide-react';
+import { Info, Globe, Users, Calendar, Menu, X } from 'lucide-react';
 
 type Tab = 'DETAILS' | 'SOCIALS' | 'MEMBERS' | 'EVENTS';
 
@@ -19,6 +19,7 @@ export default function ManageClubPage() {
 
     const [activeTab, setActiveTab] = useState<Tab>('DETAILS');
     const [loading, setLoading] = useState(true);
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const [club, setClub] = useState<Club | null>(null);
 
     // Details State
@@ -226,28 +227,19 @@ export default function ManageClubPage() {
     return (
         <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--fg)', fontFamily: 'var(--font-inter)' }}>
             <Navbar />
-            <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 40px' }}>
+            <main className="dashboard-layout" style={{ maxWidth: '1400px', margin: '0 auto', padding: '100px 24px 80px' }}>
 
-                {/* Header with Back Button */}
-                <div style={{ marginBottom: '40px' }}>
-                    <Link href="/dashboard/club-admin" style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '5px', marginBottom: '10px' }}>
-                        ← Back to Dashboard
-                    </Link>
-                    <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>Manage <span style={{ color: '#3b82f6' }}>{club?.name}</span></h1>
-                </div>
+                {isMobileSidebarOpen && (
+                    <div className="sidebar-overlay" onClick={() => setIsMobileSidebarOpen(false)}></div>
+                )}
 
-                <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '40px', alignItems: 'start' }}>
-                    {/* Sidebar Tabs */}
-                    <div style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        gap: '16px',
-                        background: 'var(--primary)',
-                        padding: '16px',
-                        borderRadius: '24px',
-                        alignItems: 'center'
-                    }}>
-                        {([
+                <div className={`dashboard-sidebar ${isMobileSidebarOpen ? 'open' : ''}`}>
+                    
+                    <div className="mobile-only" style={{ alignSelf: 'flex-end', marginBottom: '20px', cursor: 'pointer', padding: '8px' }} onClick={() => setIsMobileSidebarOpen(false)}>
+                        <X size={24} />
+                    </div>
+
+                    {([
                             { id: 'DETAILS', label: 'Details', icon: <Info size={24} /> },
                             { id: 'SOCIALS', label: 'Socials', icon: <Globe size={24} /> },
                             { id: 'MEMBERS', label: 'Members', icon: <Users size={24} /> },
@@ -256,28 +248,31 @@ export default function ManageClubPage() {
                             <button
                                 key={tab.id}
                                 title={tab.label}
-                                onClick={() => setActiveTab(tab.id as Tab)}
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    width: '48px',
-                                    height: '48px',
-                                    borderRadius: '16px',
-                                    background: activeTab === tab.id ? '#fff' : 'transparent',
-                                    color: activeTab === tab.id ? 'var(--primary)' : 'rgba(255,255,255,0.7)',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s'
-                                }}
+                                className={activeTab === tab.id ? 'active' : ''}
+                                onClick={() => { setActiveTab(tab.id as Tab); setIsMobileSidebarOpen(false); }}
                             >
                                 {tab.icon}
+                                <span className="mobile-only">{tab.label}</span>
                             </button>
                         ))}
                     </div>
 
                     {/* Content Area */}
-                <div style={{ background: 'var(--card-bg)', padding: '30px', borderRadius: '20px', border: '1px solid var(--card-border)' }}>
+                <div className="dashboard-content" style={{ flex: 1 }}>
+
+                    <button className="mobile-sidebar-hamburger" onClick={() => setIsMobileSidebarOpen(true)}>
+                        <Menu size={20} /> <span>Menu</span>
+                    </button>
+
+                    {/* Header with Back Button (Moved inside content) */}
+                    <div style={{ marginBottom: '40px' }}>
+                        <Link href="/dashboard/club-admin" style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '5px', marginBottom: '10px' }}>
+                            ← Back to Dashboard
+                        </Link>
+                        <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', fontFamily: 'var(--font-outfit)' }}>Manage <span style={{ color: '#3b82f6' }}>{club?.name}</span></h1>
+                    </div>
+
+                    <div style={{ background: 'var(--card-bg)', padding: '30px', borderRadius: '20px', border: '1px solid var(--card-border)' }}>
 
                     {/* DETAILS TAB */}
                     {activeTab === 'DETAILS' && (

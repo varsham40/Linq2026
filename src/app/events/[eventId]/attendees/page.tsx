@@ -117,7 +117,7 @@ export default function AttendeeListPage({ params }: { params: Promise<{ eventId
                 </div>
 
                 {viewTab === 'ATTENDEES' && (
-                    <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '24px', overflow: 'hidden' }}>
+                    <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '24px', overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                         <thead>
                             <tr style={{ borderBottom: '1px solid var(--card-border)', background: 'var(--hover-bg)' }}>

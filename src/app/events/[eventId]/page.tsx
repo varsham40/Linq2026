@@ -255,6 +255,9 @@ export default function EventDetailPage({ params }: { params: Promise<{ eventId:
                     .event-grid { grid-template-columns: 1fr !important; }
                     .info-row { grid-template-columns: 1fr !important; }
                     .panel-grid { grid-template-columns: repeat(2, 1fr) !important; }
+                    .hero-container { height: 300px !important; }
+                    .hero-overlay { max-width: 100% !important; padding: 20px !important; bottom: 12px !important; left: 12px !important; width: calc(100% - 24px) !important; box-sizing: border-box !important; }
+                    .hero-title { font-size: 1.8rem !important; }
                 }
                 .announcements-overlay {
                     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -305,10 +308,10 @@ export default function EventDetailPage({ params }: { params: Promise<{ eventId:
                 }
             `}} />
 
-            <main style={{ maxWidth: '1600px', margin: '0 auto', padding: '100px 24px 80px' }}>
+            <main className="mobile-px-4 mobile-py-8" style={{ maxWidth: '1600px', margin: '0 auto', padding: '100px 24px 80px' }}>
 
                 {/* Hero Section */}
-                <div style={{ position: 'relative', width: '100%', height: '350px', borderRadius: '24px', overflow: 'hidden', marginBottom: '24px', background: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+                <div className="hero-container" style={{ position: 'relative', width: '100%', height: '350px', borderRadius: '24px', overflow: 'hidden', marginBottom: '24px', background: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
                     {event.posterURL ? (
                         <img src={event.posterURL} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
@@ -316,11 +319,11 @@ export default function EventDetailPage({ params }: { params: Promise<{ eventId:
                     )}
                     
                     {/* Glassmorphic Overlay */}
-                    <div style={{ position: 'absolute', bottom: '24px', left: '24px', padding: '32px', background: 'var(--glass-bg)', backdropFilter: 'blur(12px)', borderRadius: '20px', border: '1px solid var(--glass-border)', maxWidth: '80%' }}>
+                    <div className="hero-overlay" style={{ position: 'absolute', bottom: '24px', left: '24px', padding: '32px', background: 'var(--glass-bg)', backdropFilter: 'blur(12px)', borderRadius: '20px', border: '1px solid var(--glass-border)', maxWidth: '80%' }}>
                         <div style={{ fontSize: '0.9rem', color: 'var(--primary)', fontWeight: 'bold', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                             {club?.name || 'Unknown Club'}
                         </div>
-                        <h1 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '16px', color: 'var(--fg)', fontFamily: 'var(--font-outfit)', lineHeight: 1.1 }}>
+                        <h1 className="hero-title" style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '16px', color: 'var(--fg)', fontFamily: 'var(--font-outfit)', lineHeight: 1.1 }}>
                             {event.title}
                         </h1>
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -347,12 +350,17 @@ export default function EventDetailPage({ params }: { params: Promise<{ eventId:
                             )}
                             {registration && (
                                 <div style={{ display: 'flex', gap: '8px' }}>
-                                    <div style={{ padding: '6px 14px', borderRadius: '20px', background: 'rgba(34, 197, 94, 0.1)', border: '1px solid #22c55e', color: '#22c55e', fontSize: '0.85rem', fontWeight: 'bold' }}>
-                                        ✓ Registered
+                                    <div style={{ padding: '6px 14px', borderRadius: '20px', background: registration.attended ? 'rgba(139, 92, 246, 0.1)' : 'rgba(34, 197, 94, 0.1)', border: registration.attended ? '1px solid #8b5cf6' : '1px solid #22c55e', color: registration.attended ? '#8b5cf6' : '#22c55e', fontSize: '0.85rem', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
+                                        {registration.attended ? '✓ Attended' : '✓ Registered'}
                                     </div>
-                                    <button onClick={() => setShowTicket(true)} style={{ padding: '6px 14px', borderRadius: '20px', background: 'var(--fg)', color: 'var(--bg)', border: 'none', fontSize: '0.85rem', fontWeight: 'bold', cursor: 'pointer' }}>
+                                    <button onClick={() => setShowTicket(true)} style={{ padding: '6px 14px', borderRadius: '20px', background: 'var(--fg)', color: 'var(--bg)', border: 'none', fontSize: '0.85rem', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                                         View Ticket
                                     </button>
+                                    {isEventEnded && registration.attended && (
+                                        <Link href={`/events/${eventId}/feedback`} style={{ padding: '6px 14px', borderRadius: '20px', background: 'var(--primary)', color: '#fff', border: 'none', fontSize: '0.85rem', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+                                            Give Feedback
+                                        </Link>
+                                    )}
                                 </div>
                             )}
                         </div>

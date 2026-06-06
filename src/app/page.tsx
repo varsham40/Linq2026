@@ -51,7 +51,7 @@ export default function LandingPage() {
     // Helper Animation Variants
     const fadeUp = {
         hidden: { opacity: 0, y: 30 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+        visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } }
     };
 
     return (
@@ -62,7 +62,7 @@ export default function LandingPage() {
             </div>
 
             {/* SECTION 1: HERO */}
-            <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: '80px', overflow: 'hidden' }}>
+            <section className="landing-section" style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                 
                 {/* Background Glows */}
                 <div style={{ position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)', width: '800px', height: '800px', background: 'radial-gradient(circle, rgba(108, 76, 241, 0.15) 0%, rgba(0, 0, 0, 0) 70%)', zIndex: 0 }} />
@@ -73,17 +73,17 @@ export default function LandingPage() {
                         <Zap size={14} /> The Next-Gen Campus Platform
                     </motion.div>
 
-                    <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6 }} style={{ fontSize: '4.5rem', fontWeight: '900', fontFamily: 'var(--font-outfit)', lineHeight: '1.1', marginBottom: '24px', letterSpacing: '-1px' }}>
+                    <motion.h1 className="landing-h1" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6 }} style={{ fontSize: '4.5rem', fontWeight: '900', fontFamily: 'var(--font-outfit)', lineHeight: '1.1', marginBottom: '24px', letterSpacing: '-1px' }}>
                         Where Campus Life <br/>
                         <span style={{ background: `linear-gradient(to right, ${C.primary}, ${C.secondary})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Comes Alive.</span>
                     </motion.h1>
 
-                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.6 }} style={{ fontSize: '1.2rem', color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '40px', maxWidth: '600px' }}>
+                    <motion.p className="landing-p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.6 }} style={{ fontSize: '1.2rem', color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '40px', maxWidth: '600px' }}>
                         Discover events, connect with clubs, earn certificates, build your portfolio, and unlock opportunities through one intelligent platform.
                     </motion.p>
 
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                        <Link href={!user ? "/signup" : "/dashboard/student"} style={{ textDecoration: 'none' }}>
+                    <motion.div className="landing-buttons" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <Link href={!user ? "/signup" : "/dashboard/student"} style={{ textDecoration: 'none', width: 'auto' }} className="mobile-full-width">
                             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} style={{ padding: '16px 32px', background: C.primary, color: '#fff', border: 'none', borderRadius: '30px', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: `0 10px 25px rgba(108, 76, 241, 0.4)` }}>
                                 Get Started <ArrowRight size={18} />
                             </motion.button>
@@ -98,6 +98,7 @@ export default function LandingPage() {
 
                 {/* Floating 3D Dashboard Element */}
                 <motion.div 
+                    className="landing-mockup"
                     initial={{ opacity: 0, y: 100, rotateX: 20 }}
                     animate={{ opacity: 1, y: 0, rotateX: 0 }}
                     transition={{ delay: 0.7, duration: 1, type: 'spring' }}
@@ -111,7 +112,7 @@ export default function LandingPage() {
                     </div>
                     
                     {/* Mock Dashboard Content */}
-                    <div style={{ padding: '30px', display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', height: 'calc(100% - 50px)' }}>
+                    <div className="landing-mockup-inner" style={{ padding: '30px', display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', height: 'calc(100% - 50px)' }}>
                         
                         {/* Left Column (Event Feed) */}
                         <div style={{ background: 'var(--bg)', borderRadius: '16px', padding: '20px', border: '1px solid var(--card-border)', overflow: 'hidden' }}>
@@ -186,14 +187,14 @@ export default function LandingPage() {
             </section>
 
             {/* SECTION 2: BENTO BOX / EVERYTHING STUDENTS NEED */}
-            <section style={{ padding: '120px 24px', background: 'var(--bg)', position: 'relative' }}>
+            <section className="landing-section" style={{ padding: '120px 24px', background: 'var(--bg)', position: 'relative' }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
                     <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp} style={{ textAlign: 'center', marginBottom: '60px' }}>
-                        <h2 style={{ fontSize: '3rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '16px', color: 'var(--fg)' }}>One Platform. <span style={{ color: C.primary }}>Endless Possibilities.</span></h2>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto' }}>Explore events, earn real experience, collect verified certificates, and build a portfolio that stands out.</p>
+                        <h2 className="landing-h2" style={{ fontSize: '3rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '16px', color: 'var(--fg)' }}>One Platform. <span style={{ color: C.primary }}>Endless Possibilities.</span></h2>
+                        <p className="landing-p" style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto' }}>Explore events, earn real experience, collect verified certificates, and build a portfolio that stands out.</p>
                     </motion.div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+                    <div className="landing-bento" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
                         {[
                             { title: 'Discover Events', icon: <Search />, color: C.primary, desc: 'Find workshops, hackathons, and seminars tailored to your major.' },
                             { title: 'Smart Registrations', icon: <Ticket />, color: C.secondary, desc: 'One-click registrations without filling out forms repeatedly.' },
@@ -220,11 +221,11 @@ export default function LandingPage() {
             </section>
 
             {/* SECTION 3: AI CAMPUS ASSISTANT */}
-            <section style={{ padding: '120px 24px', background: `linear-gradient(135deg, ${C.primary} 0%, ${C.secondary} 100%)`, color: '#fff', overflow: 'hidden' }}>
-                <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '60px', alignItems: 'center' }}>
+            <section className="landing-section" style={{ padding: '120px 24px', background: `linear-gradient(135deg, ${C.primary} 0%, ${C.secondary} 100%)`, color: '#fff', overflow: 'hidden' }}>
+                <div className="landing-grid" style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '60px', alignItems: 'center' }}>
                     <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                        <h2 style={{ fontSize: '3.5rem', fontWeight: '900', fontFamily: 'var(--font-outfit)', marginBottom: '24px', lineHeight: '1.1' }}>Ask Linq Anything.</h2>
-                        <p style={{ fontSize: '1.2rem', opacity: 0.9, lineHeight: '1.6', marginBottom: '32px' }}>
+                        <h2 className="landing-h2" style={{ fontSize: '3.5rem', fontWeight: '900', fontFamily: 'var(--font-outfit)', marginBottom: '24px', lineHeight: '1.1' }}>Ask Linq Anything.</h2>
+                        <p className="landing-p" style={{ fontSize: '1.2rem', opacity: 0.9, lineHeight: '1.6', marginBottom: '32px' }}>
                             Your intelligent campus assistant knows exactly what's happening. From finding machine learning clubs to building your portfolio, just ask.
                         </p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -260,14 +261,14 @@ export default function LandingPage() {
             </section>
 
             {/* SECTION 4: STUDENT PORTFOLIO */}
-            <section style={{ padding: '120px 24px', background: 'var(--bg)' }}>
+            <section className="landing-section" style={{ padding: '120px 24px', background: 'var(--bg)' }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
-                    <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ fontSize: '3rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '16px', color: 'var(--fg)' }}>Turn Participation Into <span style={{ color: C.primary }}>Proof.</span></motion.h2>
-                    <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto 60px' }}>
+                    <motion.h2 className="landing-h2" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ fontSize: '3rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '16px', color: 'var(--fg)' }}>Turn Participation Into <span style={{ color: C.primary }}>Proof.</span></motion.h2>
+                    <motion.p className="landing-p" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto 60px' }}>
                         Your beautifully formatted public profile tracks skills, certificates, and achievements automatically.
                     </motion.p>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '60px' }}>
+                    <div className="landing-bento" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '60px' }}>
                         {[ {num: '5000+', lbl: 'Certificates'}, {num: '12000+', lbl: 'Registrations'}, {num: '300+', lbl: 'Events'}, {num: '100+', lbl: 'Clubs'} ].map((stat, i) => (
                             <motion.div key={i} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} style={{ background: 'var(--card-bg)', padding: '32px', borderRadius: '24px', border: `1px solid var(--card-border)`, boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
                                 <div style={{ fontSize: '2.5rem', fontWeight: '900', fontFamily: 'var(--font-outfit)', color: C.primary, marginBottom: '8px' }}>{stat.num}</div>
@@ -279,10 +280,10 @@ export default function LandingPage() {
             </section>
 
             {/* SECTION 5: ROLE-BASED ACCESS & CLUB ECOSYSTEM */}
-            <section style={{ padding: '120px 24px', background: 'var(--card-bg)' }}>
+            <section className="landing-section" style={{ padding: '120px 24px', background: 'var(--card-bg)' }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
-                    <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ fontSize: '3rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '16px', color: 'var(--fg)' }}>Every Community. <span style={{ color: C.secondary }}>One Network.</span></motion.h2>
-                    <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '800px', margin: '0 auto 60px' }}>
+                    <motion.h2 className="landing-h2" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ fontSize: '3rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '16px', color: 'var(--fg)' }}>Every Community. <span style={{ color: C.secondary }}>One Network.</span></motion.h2>
+                    <motion.p className="landing-p" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '800px', margin: '0 auto 60px' }}>
                         Linq connects the entire campus hierarchy with secure, powerful role-based access.
                     </motion.p>
 
@@ -306,15 +307,15 @@ export default function LandingPage() {
             </section>
 
             {/* SECTION 6: EVENT EXPERIENCE TIMELINE */}
-            <section style={{ padding: '120px 24px', background: 'var(--bg)' }}>
+            <section className="landing-section" style={{ padding: '120px 24px', background: 'var(--bg)' }}>
                 <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-                    <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ textAlign: 'center', fontSize: '3rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '80px', color: 'var(--fg)' }}>The Seamless <span style={{ color: C.accent }}>Event Journey</span></motion.h2>
+                    <motion.h2 className="landing-h2" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ textAlign: 'center', fontSize: '3rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '80px', color: 'var(--fg)' }}>The Seamless <span style={{ color: C.accent }}>Event Journey</span></motion.h2>
                     
-                    <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
-                        <div style={{ position: 'absolute', top: '24px', left: '0', right: '0', height: '2px', background: 'var(--card-border)', zIndex: 0 }} />
+                    <div className="landing-timeline" style={{ display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
+                        <div className="landing-timeline-line" style={{ position: 'absolute', top: '24px', left: '0', right: '0', height: '2px', background: 'var(--card-border)', zIndex: 0 }} />
                         {[ 'Register', 'Receive Ticket', 'QR Check-In', 'Attend Event', 'Submit Feedback', 'Earn Certificate' ].map((step, i) => (
-                            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', width: '120px', textAlign: 'center' }}>
-                                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--card-bg)', border: `2px solid ${C.primary}`, color: C.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', boxShadow: '0 4px 10px rgba(108,76,241,0.2)' }}>
+                            <motion.div key={i} className="step-item" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', width: '120px', textAlign: 'center' }}>
+                                <div style={{ width: '48px', height: '48px', flexShrink: 0, borderRadius: '50%', background: 'var(--card-bg)', border: `2px solid ${C.primary}`, color: C.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', boxShadow: '0 4px 10px rgba(108,76,241,0.2)' }}>
                                     {i + 1}
                                 </div>
                                 <div style={{ fontWeight: 'bold', fontSize: '0.9rem', color: 'var(--fg)' }}>{step}</div>
@@ -325,12 +326,12 @@ export default function LandingPage() {
             </section>
 
             {/* SECTION 7: FEATURED EVENTS & TESTIMONIALS */}
-            <section id="events" style={{ padding: '120px 24px', background: 'var(--card-bg)' }}>
+            <section id="events" className="landing-section" style={{ padding: '120px 24px', background: 'var(--card-bg)' }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'flex-start' }}>
+                    <div className="landing-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'flex-start' }}>
                         
                         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                            <h2 style={{ fontSize: '2.5rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '24px', color: 'var(--fg)' }}>Featured Events</h2>
+                            <h2 className="landing-h2" style={{ fontSize: '2.5rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '24px', color: 'var(--fg)' }}>Featured Events</h2>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                                 {featuredEvents.map(event => (
                                     <div key={event.id} onClick={() => router.push(!user ? '/signup' : '/dashboard/student')} style={{ background: 'var(--bg)', padding: '24px', borderRadius: '20px', border: `1px solid var(--card-border)`, display: 'flex', gap: '20px', cursor: 'pointer', transition: 'transform 0.2s', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
@@ -349,7 +350,7 @@ export default function LandingPage() {
                         </motion.div>
 
                         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                            <h2 style={{ fontSize: '2.5rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '24px', color: 'var(--fg)' }}>What Students Say</h2>
+                            <h2 className="landing-h2" style={{ fontSize: '2.5rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '24px', color: 'var(--fg)' }}>What Students Say</h2>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                                 {[
                                     { text: "Linq made checking into hackathons so easy. The QR code scanner is incredibly fast!", name: "Alex Chen", role: "CS Student", rating: '🤩' },
@@ -371,14 +372,14 @@ export default function LandingPage() {
             </section>
 
             {/* SECTION 8: ANALYTICS DASHBOARD MOCKUP */}
-            <section style={{ padding: '120px 24px', background: 'var(--bg)', textAlign: 'center' }}>
-                <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ fontSize: '3rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '16px', color: 'var(--fg)' }}>Powerful <span style={{ color: C.primary }}>Analytics.</span></motion.h2>
-                <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto 60px' }}>
+            <section className="landing-section" style={{ padding: '120px 24px', background: 'var(--bg)', textAlign: 'center' }}>
+                <motion.h2 className="landing-h2" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ fontSize: '3rem', fontWeight: '800', fontFamily: 'var(--font-outfit)', marginBottom: '16px', color: 'var(--fg)' }}>Powerful <span style={{ color: C.primary }}>Analytics.</span></motion.h2>
+                <motion.p className="landing-p" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto 60px' }}>
                     Admins get real-time insights into event registrations, attendance rates, and club growth.
                 </motion.p>
                 
-                <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ maxWidth: '1000px', margin: '0 auto', background: 'var(--card-bg)', padding: '40px', borderRadius: '32px', boxShadow: '0 40px 80px rgba(0,0,0,0.5)', border: `1px solid var(--card-border)` }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '40px' }}>
+                <motion.div className="landing-padding-sm" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ maxWidth: '1000px', margin: '0 auto', background: 'var(--card-bg)', padding: '40px', borderRadius: '32px', boxShadow: '0 40px 80px rgba(0,0,0,0.5)', border: `1px solid var(--card-border)` }}>
+                    <div className="landing-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '40px' }}>
                         {[ {l: 'Registrations', v: '1,420'}, {l: 'Turnout Rate', v: '87%'}, {l: 'Avg Feedback', v: '4.8/5'} ].map((s,i) => (
                             <div key={i} style={{ background: 'var(--bg)', padding: '24px', borderRadius: '20px', border: `1px solid var(--card-border)` }}>
                                 <div style={{ color: 'var(--text-muted)', marginBottom: '8px' }}>{s.l}</div>
@@ -386,27 +387,27 @@ export default function LandingPage() {
                             </div>
                         ))}
                     </div>
-                    <div style={{ height: '300px', background: `linear-gradient(to top, rgba(108,76,241,0.1) 0%, transparent 100%)`, borderRadius: '20px', border: `1px solid var(--card-border)`, display: 'flex', alignItems: 'flex-end', padding: '0 40px' }}>
+                    <div className="landing-chart" style={{ height: '300px', background: `linear-gradient(to top, rgba(108,76,241,0.1) 0%, transparent 100%)`, borderRadius: '20px', border: `1px solid var(--card-border)`, display: 'flex', alignItems: 'flex-end', padding: '0 40px' }}>
                         {/* Mock Chart Bars */}
                         {[40, 60, 30, 80, 100, 70, 90].map((h, i) => (
-                            <motion.div key={i} initial={{ height: 0 }} whileInView={{ height: `${h}%` }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.8 }} style={{ flex: 1, background: C.primary, margin: '0 10px', borderRadius: '8px 8px 0 0', opacity: 0.8 }} />
+                            <motion.div key={i} initial={{ height: 0 }} whileInView={{ height: `${h}%` }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.8 }} style={{ flex: 1, background: C.primary, margin: '0 5px', borderRadius: '4px 4px 0 0', opacity: 0.8 }} />
                         ))}
                     </div>
                 </motion.div>
             </section>
 
             {/* SECTION 9: THE FUTURE (FINAL CTA) */}
-            <section style={{ padding: '160px 24px', background: `var(--card-bg)`, color: 'var(--fg)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+            <section className="landing-section" style={{ padding: '160px 24px', background: `var(--card-bg)`, color: 'var(--fg)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '1000px', height: '1000px', background: 'radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 60%)' }} />
                 
                 <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ position: 'relative', zIndex: 1 }}>
-                    <h2 style={{ fontSize: '4.5rem', fontWeight: '900', fontFamily: 'var(--font-outfit)', marginBottom: '32px', letterSpacing: '-1px' }}>
+                    <h2 className="landing-h1" style={{ fontSize: '4.5rem', fontWeight: '900', fontFamily: 'var(--font-outfit)', marginBottom: '32px', letterSpacing: '-1px' }}>
                         More Than Events. <br />
                         An Intelligent Campus Ecosystem.
                     </h2>
                     
-                    <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                        <Link href="/signup" style={{ textDecoration: 'none' }}>
+                    <div className="landing-buttons" style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                        <Link href="/signup" style={{ textDecoration: 'none', width: 'auto' }} className="mobile-full-width">
                             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} style={{ padding: '20px 40px', background: 'var(--fg)', color: 'var(--bg)', border: 'none', borderRadius: '40px', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
                                 Join the Future of Campus Life
                             </motion.button>

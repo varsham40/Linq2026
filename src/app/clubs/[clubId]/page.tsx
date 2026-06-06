@@ -97,12 +97,19 @@ export default function ClubProfilePage({ params }: { params: Promise<{ clubId: 
     const linkedin = club.socialMedia?.linkedin || club.linkedin;
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--fg)', fontFamily: 'var(--font-inter)', transition: 'background-color 0.3s ease, color 0.3s ease' }}>
+        <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--fg)', fontFamily: 'var(--font-inter)' }}>
             <Navbar />
+            <style dangerouslySetInnerHTML={{__html: `
+                @media (max-width: 900px) {
+                    .club-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+                    .club-header { padding: 40px 16px 30px !important; }
+                    .club-title { font-size: 2.5rem !important; }
+                }
+            `}} />
             <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '140px 24px 80px' }}>
 
                 {/* Banner & Header Profile */}
-                <div style={{ 
+                <div className="club-header" style={{ 
                     position: 'relative', marginBottom: '60px', borderRadius: '24px', overflow: 'hidden',
                     background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.15), rgba(192, 132, 252, 0.05))',
                     border: '1px solid var(--primary)',
@@ -132,9 +139,9 @@ export default function ClubProfilePage({ params }: { params: Promise<{ clubId: 
                             )}
                         </div>
                         
-                        <h1 style={{ fontSize: '3.5rem', fontWeight: '900', marginBottom: '8px', color: 'var(--fg)' }}>{club.name}</h1>
+                        <h1 className="club-title" style={{ fontSize: '3.5rem', fontWeight: '900', marginBottom: '8px', color: 'var(--fg)', textAlign: 'center' }}>{club.name}</h1>
                         
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-muted)', marginBottom: '40px', fontSize: '1.1rem', fontWeight: '500' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-muted)', marginBottom: '40px', fontSize: '1.1rem', fontWeight: '500', textAlign: 'center' }}>
                             <MapPin size={20} />
                             <span>{club.name} {club.collegeId ? 'Campus' : 'Headquarters'}</span>
                         </div>
@@ -160,7 +167,7 @@ export default function ClubProfilePage({ params }: { params: Promise<{ clubId: 
                     </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '60px', alignItems: 'start' }}>
+                <div className="club-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '60px', alignItems: 'start' }}>
 
                     {/* Events Column */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>

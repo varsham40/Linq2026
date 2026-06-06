@@ -7,7 +7,7 @@ import { db } from '@/lib/firebase';
 import { Event, Registration, Club, College, Certificate } from '@/types';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
-import { RefreshCw, Calendar, MapPin, Clock, Search, Filter, Trophy, Ticket, Eye, MessageSquare, Download, Building2, School, Sparkles } from 'lucide-react';
+import { RefreshCw, Calendar, MapPin, Clock, Search, Filter, Trophy, Ticket, Eye, MessageSquare, Download, Building2, School, Sparkles, Menu, X } from 'lucide-react';
 import TicketModal from '@/components/TicketModal';
 import { generateCertificatePDF } from '@/lib/certificate-generator';
 
@@ -58,6 +58,7 @@ interface CardProps {
 export default function StudentDashboard() {
     const { user, profile } = useAuth(); // profile is UserProfile
     const [loading, setLoading] = useState(true);
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
     // Data State
     const [events, setEvents] = useState<Event[]>([]);
@@ -243,35 +244,41 @@ export default function StudentDashboard() {
     return (
         <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--fg)', fontFamily: 'var(--font-inter)', transition: 'background-color 0.3s ease, color 0.3s ease' }}>
             <Navbar />
-            <main style={{ maxWidth: '1600px', margin: '0 auto', padding: '100px 24px 80px', display: 'flex', gap: '32px' }}>
-                
+            <main className="dashboard-layout" style={{ maxWidth: '1600px', margin: '0 auto', padding: '100px 24px 80px', display: 'flex', gap: '32px' }}>
+
+                {isMobileSidebarOpen && (
+                    <div className="sidebar-overlay" onClick={() => setIsMobileSidebarOpen(false)}></div>
+                )}
+
                 {/* VERTICAL SIDEBAR */}
-                <div style={{ width: '80px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', paddingTop: '16px' }}>
+                <div className={`dashboard-sidebar ${isMobileSidebarOpen ? 'open' : ''}`}>
+                    <div className="mobile-only" style={{ alignSelf: 'flex-end', marginBottom: '20px', cursor: 'pointer', padding: '8px' }} onClick={() => setIsMobileSidebarOpen(false)}>
+                        <X size={24} color="var(--text-muted)" />
+                    </div>
                     {[
-                        { id: 'DISCOVER', label: 'Discover', icon: Icons.Search },
-                        { id: 'MY_EVENTS', label: 'My Events', icon: Icons.Calendar },
+                        { id: 'DISCOVER', label: 'Dash', icon: Icons.Search },
+                        { id: 'MY_EVENTS', label: 'Events', icon: Icons.Calendar },
                         { id: 'CLUBS', label: 'Clubs', icon: Icons.Filter },
-                        { id: 'CERTIFICATES', label: 'Certificates', icon: Icons.Trophy }
+                        { id: 'CERTIFICATES', label: 'Certs', icon: Icons.Trophy }
                     ].map(nav => (
                         <button
                             key={nav.id}
-                            onClick={() => setActiveTab(nav.id as any)}
-                            style={{
-                                width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                background: activeTab === nav.id ? 'var(--primary)' : 'var(--card-bg)',
-                                color: activeTab === nav.id ? '#fff' : 'var(--text-muted)',
-                                border: '1px solid var(--card-border)', cursor: 'pointer', transition: 'all 0.2s',
-                                boxShadow: activeTab === nav.id ? '0 4px 16px rgba(192, 132, 252, 0.4)' : 'none'
-                            }}
+                            className={activeTab === nav.id ? 'active' : ''}
+                            onClick={() => { setActiveTab(nav.id as any); setIsMobileSidebarOpen(false); }}
                             title={nav.label}
                         >
-                            <nav.icon size={24} />
+                            <nav.icon size={22} />
+                            <span className="mobile-only">{nav.label}</span>
                         </button>
                     ))}
                 </div>
 
                 {/* MAIN CONTENT AREA */}
-                <div style={{ flex: 1, paddingLeft: '16px' }}>
+                <div className="dashboard-content" style={{ flex: 1 }}>
+
+                    <button className="mobile-sidebar-hamburger" onClick={() => setIsMobileSidebarOpen(true)}>
+                        <Menu size={20} /> <span>Menu</span>
+                    </button>
 
                     {/* Welcome Header - Centered */}
                     <div style={{ marginBottom: '40px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -282,43 +289,43 @@ export default function StudentDashboard() {
                     {/* Filters */}
                     <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '40px', alignItems: 'center', justifyContent: 'center' }}>
                         <div style={{ flex: 1, maxWidth: '400px', position: 'relative' }}>
-                                <Icons.Search style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} size={18} />
-                                <input
-                                    type="text"
-                                    placeholder="Search..."
-                                    value={searchQuery}
-                                    onChange={e => setSearchQuery(e.target.value)}
-                                    style={{ width: '100%', padding: '14px 14px 14px 44px', background: 'var(--input-bg)', border: '1px solid var(--card-border)', borderRadius: '12px', color: 'var(--fg)', outline: 'none', fontSize: '0.95rem', fontWeight: '500', transition: 'border-color 0.2s' }}
-                                />
-                            </div>
-
-                            <div style={{ position: 'relative', minWidth: '240px' }}>
-                                <Icons.School style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} size={18} />
-                                <select
-                                    value={selectedCollegeId}
-                                    onChange={e => setSelectedCollegeId(e.target.value)}
-                                    style={{ width: '100%', padding: '14px 14px 14px 44px', background: 'var(--input-bg)', border: '1px solid var(--card-border)', borderRadius: '12px', color: 'var(--fg)', appearance: 'none', cursor: 'pointer', height: '100%', fontSize: '0.95rem', fontWeight: '500', transition: 'border-color 0.2s' }}
-                                >
-                                    <option value="ALL">All Colleges</option>
-                                    {profile?.homeCollegeId && (
-                                        <option value={profile.homeCollegeId}>My Campus ({profile.homeCollegeId})</option>
-                                    )}
-                                    {colleges
-                                        .filter(c => c.id !== profile?.homeCollegeId && c.name !== profile?.homeCollegeId)
-                                        .map(c => (
-                                            <option key={c.id} value={c.id}>{c.name}</option>
-                                        ))
-                                    }
-                                </select>
-                                <div style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-muted)' }}>▼</div>
-                            </div>
+                            <Icons.Search style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} size={18} />
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                                style={{ width: '100%', padding: '14px 14px 14px 44px', background: 'var(--input-bg)', border: '1px solid var(--card-border)', borderRadius: '12px', color: 'var(--fg)', outline: 'none', fontSize: '0.95rem', fontWeight: '500', transition: 'border-color 0.2s' }}
+                            />
                         </div>
+
+                        <div style={{ position: 'relative', minWidth: '240px' }}>
+                            <Icons.School style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} size={18} />
+                            <select
+                                value={selectedCollegeId}
+                                onChange={e => setSelectedCollegeId(e.target.value)}
+                                style={{ width: '100%', padding: '14px 14px 14px 44px', background: 'var(--input-bg)', border: '1px solid var(--card-border)', borderRadius: '12px', color: 'var(--fg)', appearance: 'none', cursor: 'pointer', height: '100%', fontSize: '0.95rem', fontWeight: '500', transition: 'border-color 0.2s' }}
+                            >
+                                <option value="ALL">All Colleges</option>
+                                {profile?.homeCollegeId && (
+                                    <option value={profile.homeCollegeId}>My Campus ({profile.homeCollegeId})</option>
+                                )}
+                                {colleges
+                                    .filter(c => c.id !== profile?.homeCollegeId && c.name !== profile?.homeCollegeId)
+                                    .map(c => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))
+                                }
+                            </select>
+                            <div style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-muted)' }}>▼</div>
+                        </div>
+                    </div>
 
                     {/* Content */}
                     {activeTab === 'DISCOVER' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
                             {discoverEvents.length === 0 && <div style={{ opacity: 0.5, textAlign: 'center', padding: '40px' }}>No upcoming events found.</div>}
-                            
+
                             {liveDiscoverEvents.length > 0 && (
                                 <section>
                                     <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px', color: '#10b981' }}>
@@ -451,7 +458,10 @@ function EventCard({ event, clubName, collegeName, registration, onOpenTicket }:
 function PastEventCard({ event, profile, registration, certificate, clubName, collegeName, onOpenTicket }: { event: Event, profile: any, registration?: Registration, certificate?: Certificate, clubName: string, collegeName: string, onOpenTicket: () => void }) {
     const wasAttended = registration?.attended;
     const isManager = (profile?.role === 'club_member' || profile?.role === 'club_admin') && profile?.clubId === event.clubId;
-    const canSeeFeedback = wasAttended || isManager;
+    const isEventEnded = event.status === 'ENDED' || new Date(event.endTime).getTime() < Date.now();
+    
+    // Only show feedback and memories if they ACTUALLY attended (or have a cert), or if they are a manager
+    const canSeeFeedback = wasAttended || !!certificate || isManager;
     const imageSrc = getEventImage(event);
     const hasWallOfLove = (event as any).recapData?.published;
 
@@ -466,8 +476,8 @@ function PastEventCard({ event, profile, registration, certificate, clubName, co
                 <div style={{ marginTop: 'auto', display: 'flex', gap: '24px', justifyContent: 'space-between', paddingTop: '16px', borderTop: '1px solid var(--card-border)' }}>
                     <Link href={`/events/${event.id}`} style={{ color: 'var(--fg)', textAlign: 'center', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}><Icons.Eye size={20} /><div style={{ fontSize: '0.7rem', fontWeight: 'bold' }}>Details</div></Link>
                     {registration && <button onClick={onOpenTicket} style={{ background: 'none', border: 'none', color: 'var(--fg)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}><Icons.Ticket size={20} /><div style={{ fontSize: '0.7rem', fontWeight: 'bold' }}>Ticket</div></button>}
-                    
-                    {hasWallOfLove && (
+
+                    {hasWallOfLove && canSeeFeedback && (
                         <Link href={`/events/${event.id}#wall-of-love`} style={{ color: '#ec4899', textAlign: 'center', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                             <Icons.Sparkles size={20} />
                             <div style={{ fontSize: '0.7rem', fontWeight: 'bold' }}>Memories</div>
@@ -475,7 +485,7 @@ function PastEventCard({ event, profile, registration, certificate, clubName, co
                     )}
 
                     {canSeeFeedback && (
-                        event.status === 'ENDED' ? (
+                        isEventEnded ? (
                             <Link href={`/events/${event.id}/feedback`} style={{ color: 'var(--fg)', textAlign: 'center', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}><Icons.Message size={20} /><div style={{ fontSize: '0.7rem', fontWeight: 'bold' }}>Feedback</div></Link>
                         ) : (
                             <button disabled style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'not-allowed', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }} title="Event must be ended to give feedback">
