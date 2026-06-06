@@ -444,10 +444,9 @@ export default function AnalyticsPage({ params }: { params: Promise<{ eventId: s
                 </div>
 
                 {/* AI Magic Wrap-up Section (Trigger) */}
-                {eventData?.status === 'ENDED' && (
-                    <div 
-                        onClick={() => setIsWrapUpModalOpen(true)}
-                        style={{ background: 'linear-gradient(135deg, var(--primary), var(--accent))', borderRadius: '24px', padding: '32px', marginBottom: '40px', boxShadow: '0 8px 32px rgba(147, 51, 234, 0.3)', cursor: 'pointer', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'transform 0.2s' }}
+                <div 
+                    onClick={() => setIsWrapUpModalOpen(true)}
+                    style={{ background: 'linear-gradient(135deg, var(--primary), var(--accent))', borderRadius: '24px', padding: '32px', marginBottom: '40px', boxShadow: '0 8px 32px rgba(147, 51, 234, 0.3)', cursor: 'pointer', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'transform 0.2s' }}
                         onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
                         onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                     >
@@ -466,7 +465,6 @@ export default function AnalyticsPage({ params }: { params: Promise<{ eventId: s
                             Open Dashboard →
                         </div>
                     </div>
-                )}
 
                 {/* 3 Column Charts Grid */}
                 <div className="analytics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
