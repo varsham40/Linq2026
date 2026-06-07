@@ -657,4 +657,73 @@ a:hover {
         padding-top: 4rem;
         padding-bottom: 2rem;
     }
+
+    /* Push floating buttons above the bottom nav bar */
+    .fab-copilot {
+        bottom: 90px !important;
+    }
+
+    .fab-announcement {
+        bottom: 160px !important;
+    }
+
+    /* AI Magic Wrapup Banner - stack on mobile */
+    .ai-wrapup-banner {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 16px !important;
+        padding: 24px !important;
+    }
+
+    .ai-wrapup-banner .ai-wrapup-inner {
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    .ai-wrapup-banner .ai-wrapup-inner h2 {
+        font-size: 1.3rem !important;
+    }
+
+    .ai-wrapup-banner .ai-wrapup-btn {
+        align-self: flex-start !important;
+        padding: 10px 20px !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* AI Magic Wrapup Modal - full screen on mobile */
+    .magic-wrapup-modal {
+        max-width: 100% !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+        max-height: 100vh !important;
+    }
+
+    .magic-wrapup-header {
+        padding: 16px !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        align-items: flex-start !important;
+    }
+
+    .magic-wrapup-header h2 {
+        font-size: 1.2rem !important;
+    }
+
+    .magic-wrapup-header > div:first-child {
+        gap: 10px !important;
+    }
+
+    .magic-wrapup-header > div:first-child > div:first-child {
+        width: 36px !important;
+        height: 36px !important;
+    }
+
+    .magic-wrapup-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+
+    .magic-wrapup-grid > div {
+        padding: 20px !important;
+    }
 }

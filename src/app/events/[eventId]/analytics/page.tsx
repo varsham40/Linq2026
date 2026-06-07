@@ -445,6 +445,7 @@ export default function AnalyticsPage({ params }: { params: Promise<{ eventId: s
 
                 {/* AI Magic Wrap-up Section (Trigger) */}
                 <div 
+                    className="ai-wrapup-banner"
                     onClick={() => setIsWrapUpModalOpen(true)}
                     style={{ background: 'linear-gradient(135deg, var(--primary), var(--accent))', borderRadius: '24px', padding: '32px', marginBottom: '40px', boxShadow: '0 8px 32px rgba(147, 51, 234, 0.3)', cursor: 'pointer', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'transform 0.2s' }}
                         onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
@@ -452,7 +453,7 @@ export default function AnalyticsPage({ params }: { params: Promise<{ eventId: s
                     >
                         <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '200px', height: '200px', background: '#fff', opacity: 0.1, filter: 'blur(40px)', borderRadius: '50%' }}></div>
                         
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', position: 'relative', zIndex: 10 }}>
+                        <div className="ai-wrapup-inner" style={{ display: 'flex', alignItems: 'center', gap: '20px', position: 'relative', zIndex: 10 }}>
                             <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'rgba(255,255,255,0.2)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <Sparkles size={32} />
                             </div>
@@ -461,7 +462,7 @@ export default function AnalyticsPage({ params }: { params: Promise<{ eventId: s
                                 <p style={{ margin: '4px 0 0', fontSize: '1rem', opacity: 0.9 }}>Open the Event Recap & Wall of Love Dashboard ✨</p>
                             </div>
                         </div>
-                        <div style={{ color: '#fff', background: 'rgba(255,255,255,0.2)', padding: '12px 24px', borderRadius: '12px', fontWeight: 'bold' }}>
+                        <div className="ai-wrapup-btn" style={{ color: '#fff', background: 'rgba(255,255,255,0.2)', padding: '12px 24px', borderRadius: '12px', fontWeight: 'bold' }}>
                             Open Dashboard →
                         </div>
                     </div>

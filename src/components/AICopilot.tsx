@@ -65,7 +65,7 @@ export default function AICopilot() {
   if (!user) return null;
 
   return (
-    <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: isOpen ? 2000 : 50, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+    <div className="fab-copilot" style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: isOpen ? 2000 : 50, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', transition: 'bottom 0.3s ease' }}>
       {isOpen && (
         <div 
           style={{ 

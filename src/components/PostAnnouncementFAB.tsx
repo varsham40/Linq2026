@@ -98,6 +98,7 @@ export default function PostAnnouncementFAB() {
             
             {/* FAB */}
             <button 
+                className="fab-announcement"
                 onClick={() => setIsOpen(true)}
                 style={{
                     position: 'fixed',
