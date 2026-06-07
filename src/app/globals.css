@@ -492,9 +492,15 @@ a:hover {
 
     .dashboard-layout {
         flex-direction: column !important;
+        padding-top: 80px !important; /* Tighter space from navbar */
         padding-left: 1rem !important;
         padding-right: 1rem !important;
         padding-bottom: 120px !important; /* Space for bottom nav */
+    }
+
+    /* Tighten top padding for all main layout wrappers on mobile */
+    main, .landing-section, [style*="padding: 120px"], [style*="padding: 100px"] {
+        padding-top: 80px !important;
     }
 
     .dashboard-content {
