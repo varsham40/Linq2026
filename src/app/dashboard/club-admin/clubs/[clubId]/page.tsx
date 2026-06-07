@@ -386,8 +386,8 @@ export default function ManageClubPage() {
                             {events.length === 0 ? <p style={{ opacity: 0.5 }}>No events found.</p> : (
                                 <div style={{ display: 'grid', gap: '16px' }}>
                                     {events.map(ev => (
-                                        <div key={ev.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--hover-bg)', borderRadius: '12px', border: '1px solid var(--card-border)' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                        <div key={ev.id} style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--hover-bg)', borderRadius: '12px', border: '1px solid var(--card-border)' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: '1 1 min-content' }}>
                                                 {ev.posterURL && <img src={ev.posterURL} style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />}
                                                 <div>
                                                     <div style={{ fontWeight: 'bold' }}>{ev.title}</div>
@@ -395,10 +395,10 @@ export default function ManageClubPage() {
                                                 </div>
                                             </div>
                                             <div style={{ display: 'flex', gap: '10px' }}>
-                                                <Link href={`/events/${ev.id}`} style={{ padding: '6px 12px', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', fontSize: '0.85rem', textDecoration: 'none', color: '#fff' }}>
+                                                <Link href={`/events/${ev.id}`} style={{ padding: '6px 12px', borderRadius: '6px', background: 'var(--primary)', fontSize: '0.85rem', textDecoration: 'none', color: '#fff', fontWeight: 'bold' }}>
                                                     View
                                                 </Link>
-                                                <button onClick={() => handleDeleteEvent(ev.id)} style={{ padding: '6px 12px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.2)', color: '#fca5a5', border: '1px solid rgba(239, 68, 68, 0.3)', cursor: 'pointer', fontSize: '0.85rem' }}>
+                                                <button onClick={() => handleDeleteEvent(ev.id)} style={{ padding: '6px 12px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold' }}>
                                                     Delete
                                                 </button>
                                             </div>

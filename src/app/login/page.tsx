@@ -74,7 +74,7 @@ export default function LoginPage() {
 
                 <div style={{ position: 'relative', margin: '1.5rem 0', opacity: 0.5 }}>
                     <hr style={{ borderColor: 'var(--glass-border)' }} />
-                    <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#18181b', padding: '0 10px', fontSize: '0.8rem' }}>OR CONTINUE WITH</span>
+                    <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'var(--card-bg)', color: 'var(--fg)', padding: '0 10px', fontSize: '0.8rem' }}>OR CONTINUE WITH</span>
                 </div>
 
                 {error && <div style={{ color: '#f87171', fontSize: '0.9rem', marginBottom: '1rem', background: 'rgba(248,113,113,0.1)', padding: '0.5rem', borderRadius: '8px' }}>{error}</div>}
